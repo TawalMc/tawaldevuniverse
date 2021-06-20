@@ -19,7 +19,7 @@ export default function Projects() {
             Mes Projets
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            Showcase your projects with a hero image (16 x 9)
+            Et voici la liste des projets que je réalise.
           </p>
         </div>
         <div className="container py-12">
