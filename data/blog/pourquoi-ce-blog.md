@@ -1,0 +1,36 @@
+---
+title:  Pourquoi ce blog?
+date: "2021-06-18"
+tags: ['iot','c++','javascript','kotlin','3D','cloud']
+draft: false
+summary: "Depuis le bas, j'ai toujours aimé explorer de nouvelles choses, de nouveaux concepts, de comprendre le pourquoi des choses mais j'aime pas m'attarder sur ce qui ne me plaît pas."
+---
+
+## Alors
+*Un ordinateur vous permet de faire plus de bêtises, beaucoup plus rapidement, que n’importe quelle autre invention dans l’histoire de l’humanité. À l’exception notable des armes à feu et de la tequila — Mitch Ratcliffe*
+
+Depuis le bas, j'ai toujours aimé explorer de nouvelles choses, de nouveaux concepts, de comprendre le pourquoi des choses mais j'aime pas m'attarder sur ce qui ne me plaît pas.
+
+C'est pour cela que ma curiosité pour les languages de programmation informatique ne fait qu'augmenter. La programmation informatique nous permet de transformer nos idées en réalité. Et j'ai toujours été attiré par le récit des développeurs (populaires ou non), des noms de la science-tech. L'un des héritages de ces derniers, est le partage de leur culture en tant que dev, de leur récit, de leur consistence pour atteindre leurs objectifs. Et je voudrais aussi partager mes expériences en tant que jeune développeur.
+
+## Pourquoi ce blog
+
+Je passe beaucoup de mon temps à comprendre le monde de la tech, à pratiquer et adopter des outils et manières de faire pour participer à son développement. Je ne veux pas juste être un développeur lambda mais un vrai, complet qui donne et participe aux grandes conférences organisées dans ce domaine.
+
+Et ce blog est pour moi une première étape pour atteindre cet objectif. Je voudrais partager mes expériences, mes aventures en tant que développeur logiciel ou ingénieur en système embarqué. Etant dans l'IoT, plusieurs concepts comme le web, le matériel,.. se côtoyent. Et je me dis que je rencontre beaucoups de problèmes que je pourrais alors partager. De même je découvre de nouvelles choses excitantes ou non que je pense que partager peut aider d'autres développeurs. De courts articles à de petits tutos ou juste des paragraphes j'utiliserai plusieurs modes d'écritures pour partger mes aventures, peut être atteindrai je le panthéon des devs 🤪 et rencontrer d'autres devs. 
+
+## De quoi il parle
+
+Je suis orienté IoT donc j'y aborde principalement des notions ayant trait:
+
+* Aux systèmes embarqués: programmation des microcontrôleur, les questions matériels, les languages systèmes C/C++, pourquoi pas Elixir ou encore du Rust🤣, RTOS.
+* Au développemnt d'application mobile principalement android: Kotlin, ReactNative.
+* Au web: développement d'appli web pour IoT basé sur du JavaScript depuis le frontend jusqu'au backend.
+
+Je fais un truc de ouf dans la semaine, je le balance ici et donc vous aussi vous allez faire un truc de ouf-ouf.
+
+`Ce blog est beaucoup plus de l'exploration que d'un fervent tuto ou d'un quelconque parcours. J'explore la 3D, les bibliothèques C++, le Javascript, Kotlin et ses paterns, le monde des petits systèmes, le cloud bref l'aventure dans le code en tant que...😎`
+
+Je prépare déjà le premier article. N'oubliez par de partager les liens des articles et d'en parler à vos amis. Ce n'est pas comme les blogs ordinaires, mais pensez aux imaginations des hommes. Et suis présent sur twitter pour des discussions.
+
+*Can you smell what TawalMc is cooking ?*
