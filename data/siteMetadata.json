@@ -1,5 +1,5 @@
 {
-  "title": "Tawal Dev Universe",
+  "title": "Tawal et son univers de dev",
   "author": "Tawaliou ALAO",
   "headerTitle": "Tawal Dev Universe",
   "description": "Mon univers en tant que développeur.",
@@ -7,7 +7,7 @@
   "siteUrl": "https://tawaldevuniverse.vercel.app/",
   "siteRepo": "https://github.com/TawalMc/tawaldevuniverse",
   "image": "/static/images/avatar.png",
-  "socialBanner": "/static/images/twitter-card.png",
+  "socialBanner": "/static/images/my-photo.jpg",
   "email": "alaotawaliou@gmail.com",
   "github": "https://github.com/TawalMc",
   "twitter": "https://twitter.com/Tawal_Mc",
