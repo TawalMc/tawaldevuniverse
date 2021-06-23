@@ -7,7 +7,7 @@ summary: "Découvrons ensemble FreeRTOS, le système d'exploitation en temps ré
 images: ['https://miro.medium.com/max/2880/1*elMEPVMRFNKdpvVvZjLwoQ.png']
 ---
 
-_Cet article n'est pas pour un débutant en système embarqué mais être juste à l'aise avec les micronctrôleurs est recommandée._
+_Cet article n'est pas pour un débutant en système embarqué mais il faut juste être à l'aise avec les micronctrôleurs._
 
 ![FreeRTOS-banner](https://miro.medium.com/max/2880/1*elMEPVMRFNKdpvVvZjLwoQ.png)
 
@@ -38,7 +38,7 @@ d'autres fonctionnalités que nous pouvons découvrir par la suite.
 
 # Que nous offre FreeRTOS
 
-Actullement je suis encore en train de lire le [guide tutoriel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) sur FreeRTOS qu'on peut
+Actuellement je suis encore en train de lire le [guide tutoriel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) sur FreeRTOS qu'on peut
 retrouver sur leur site (environ 400 pages 😭, vous pouvez aller le lire aussi). Je vais néanmoins nous dispenser d'abord de certains points que je trouve un peu complexe et
 utiliser dans les prochains articles le support pour Arduino.
 
@@ -49,16 +49,16 @@ utiliser dans les prochains articles le support pour Arduino.
 - Gestionnaire de tâches et la facilité d'ajouter, supprimer et modifier l'exécution des tâches
 - L'existence des `queue` pour la communication entre les tâches: partage de données entre les tâches,...
 - La prise en charge des interruptions par exmple récupérer l'appui sur un bouton sur une broche de notre carte
-- Un système de timer, pour exécuter une fonction/task à une date donnéé dans le futur
+- Un système de timer, pour exécuter une fonction/task à une date dans le futur
 - Même une version du `delay` utilisé par les microcontrôleurs pour l'arrêt momentané du programme mais ici utilisé lors de l'exécution des tâches: `vTaskDelay()` - même fonction
 - Intégration des références de AWS (Amazon Web Services) pour les projets IoT voulant se baser sur leur cloud - à explorer
 - Le support de l'OTA (Over The Air) updates ou `mise à jour à distance du code source` via l'intégration de AWS toujours pour les systèmes supportant l'OTA - à explorer
 - Des noms de fonctions assez parlants
-- Pleins de démos sur son utilisation et le code source est totalement ouvert et gratuit à toute utilisation. Pour des options et fonctionnalités vraiment avancés des versions commerciales sont disponibles - ( _😂un ami à moi cherchera partout en gratuité la version commerciale, c'est plus fort que lui😂_ )
+- Pleins de démos sur son utilisation et le code source est totalement ouvert et gratuit à toute utilisation. Pour des options et fonctionnalités vraiment avancées des versions commerciales sont disponibles - ( _😂un ami à moi cherchera partout en gratuité la version commerciale, c'est plus fort que lui😂_ )
 
 En lisant le manuel j'avoue que la manière dont le système gère l'allocation de la mémoire est vraiment bien pensée et évite les fuites de mémoires au maximum mais aussi la fragmentation du tas d'allocation.
 Par exemple son allocation de la ram se fait en allouant simplement (je le dis ainsi) un tableau à taille fixe lors de la compilation si vous ne changer rien. Et c'est dans ce tableau
-que les différentes allocation de mémoires se feront. Différents algorithmes sont alors utilisés en fonction de vos besoins: `heap 1` à `heap 5`.
+que les différentes allocations de mémoires se feront. Différents algorithmes sont alors utilisés en fonction de vos besoins: `heap 1` à `heap 5`.
 
 ### Concepts clés de FreeRTOS
 
@@ -72,6 +72,6 @@ que les différentes allocation de mémoires se feront. Différents algorithmes 
 
 Ok, nous venons de découvrir rapidement FreeRTOS et ses avantages mais vous pouvez consulter [le manuel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) et même [la référence](https://www.freertos.org/fr-content-src/uploads/2018/07/FreeRTOS_Reference_Manual_V10.0.0.pdf) pour en savoir plus.
 Dans un prochain article nous testerons des codes sur la carte Arduino UNO en utilisant le support de FreeRTOS pour ce dernier.
-N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont juste en dessous.
+N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont en dessous.
 
 Et sur ce: _can you smell what TawalMc is cooking?_
