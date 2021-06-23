@@ -13,7 +13,7 @@ _Cet article n'est pas pour un débutant en système embarqué mais être juste 
 
 # Parlons de FreeRTOS
 
-[FreeRTOS](https://www.freertos.org/) ou Free Real Time Operating est un kernel(noyau) multitâche (multitask) pour microcotrôleur.
+[FreeRTOS](https://www.freertos.org/) ou Free Real Time Operating Système est un kernel(noyau) multitâche (multitask) pour microcotrôleur.
 Il vous permet donc (en simulant) l'exécution de plusieurs tâches en `en même temps` un peu comme sur nos systèmes
 d'exploitations habituels: Window, Linux, Android...où le matériel dispose le plus souvent de plusieurs coeurs pour permettre
 ce fonctionnement.
@@ -23,6 +23,14 @@ l'exemple suivant de plusieurs tâches à réaliser simultanément:
 - Afficher dans le moniteur série (Serial) la valeur retournée par un capteur de température - `tâche 1`
 - Eteindre et allumer une led suivant une fréquence donnée - `tâche 2`
 - Se connecter à un serveur web via le module GSM par exemple, pour y envoyer l'état de la led (vous pouvez en faire un TP 😎) - `tâche 3`
+
+![mcu-without-rtos](/static/images/mcu_without_rtos.png)
+
+_Un MCU sans RTOS et_
+
+![mcu-with-rtos](/static/images/mcu_with_rtos.png)
+
+_Un MCU avec FreeRTOS_
 
 Comme les microcontrôleurs sont limités en capacités(mémoires, processeurs, fréquence, ...), FreeRTOS a mis en place
 une architecture (`je l'avoue puissante`) basée sur l'utilisation correcte de la RAM et de son allocation, de gestionnaires de tâches (`scheduler`), et pleins
@@ -41,7 +49,7 @@ utiliser dans les prochains articles le support pour Arduino.
 - Gestionnaire de tâches et la facilité d'ajouter, supprimer et modifier l'exécution des tâches
 - L'existence des `queue` pour la communication entre les tâches: partage de données entre les tâches,...
 - La prise en charge des interruptions par exmple récupérer l'appui sur un bouton sur une broche de notre carte
-- Un système de timer, pour l'exécuter d'une fonction à une date donnéé dans le futur
+- Un système de timer, pour exécuter une fonction/task à une date donnéé dans le futur
 - Même une version du `delay` utilisé par les microcontrôleurs pour l'arrêt momentané du programme mais ici utilisé lors de l'exécution des tâches: `vTaskDelay()` - même fonction
 - Intégration des références de AWS (Amazon Web Services) pour les projets IoT voulant se baser sur leur cloud - à explorer
 - Le support de l'OTA (Over The Air) updates ou `mise à jour à distance du code source` via l'intégration de AWS toujours pour les systèmes supportant l'OTA - à explorer
