@@ -73,10 +73,10 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
               <div className="pt-10 pb-8 prose dark:prose-dark max-w-none">{children}</div>
               <div className="pt-6 pb-6 text-sm text-gray-700 dark:text-gray-300">
                 <Link href={discussUrl(slug)} rel="nofollow">
-                  {'Discuss on Twitter'}
+                  {'Discutons en sur Twitter'}
                 </Link>
                 {` • `}
-                <Link href={editUrl(fileName)}>{'View on GitHub'}</Link>
+                {/* <Link href={editUrl(fileName)}>{'Voir sur GitHub'}</Link> */}
               </div>
             </div>
             <footer>

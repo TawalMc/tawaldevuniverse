@@ -1,0 +1,69 @@
+---
+title: 'Introduction à FreeRTOS'
+date: '2021-06-22'
+tags: ['introduction', 'iot', 'freertos']
+draft: false
+summary: "Découvrons ensemble FreeRTOS, le système d'exploitation en temps réel dédié aux microcontrôleurs."
+images: ['https://miro.medium.com/max/2880/1*elMEPVMRFNKdpvVvZjLwoQ.png']
+---
+
+_Cet article n'est pas pour un débutant en système embarqué mais être juste à l'aise avec les micronctrôleurs est recommandée._
+
+![FreeRTOS-banner](https://miro.medium.com/max/2880/1*elMEPVMRFNKdpvVvZjLwoQ.png)
+
+# Parlons de FreeRTOS
+
+[FreeRTOS](https://www.freertos.org/) ou Free Real Time Operating est un kernel(noyau) multitâche (multitask) pour microcotrôleur.
+Il vous permet donc (en simulant) l'exécution de plusieurs tâches en `en même temps` un peu comme sur nos systèmes
+d'exploitations habituels: Window, Linux, Android...où le matériel dispose le plus souvent de plusieurs coeurs pour permettre
+ce fonctionnement.
+En considérant la carte [Arduino](https://www.arduino.cc/) dotée de l'AVR, on peut donner
+l'exemple suivant de plusieurs tâches à réaliser simultanément:
+
+- Afficher dans le moniteur série (Serial) la valeur retournée par un capteur de température - `tâche 1`
+- Eteindre et allumer une led suivant une fréquence donnée - `tâche 2`
+- Se connecter à un serveur web via le module GSM par exemple, pour y envoyer l'état de la led (vous pouvez en faire un TP 😎) - `tâche 3`
+
+Comme les microcontrôleurs sont limités en capacités(mémoires, processeurs, fréquence, ...), FreeRTOS a mis en place
+une architecture (`je l'avoue puissante`) basée sur l'utilisation correcte de la RAM et de son allocation, de gestionnaires de tâches (`scheduler`), et pleins
+d'autres fonctionnalités que nous pouvons découvrir par la suite.
+
+# Que nous offre FreeRTOS
+
+Actullement je suis encore en train de lire le [guide tutoriel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) sur FreeRTOS qu'on peut
+retrouver sur leur site (environ 400 pages 😭, vous pouvez aller le lire aussi). Je vais néanmoins nous dispenser d'abord de certains points que je trouve un peu complexe et
+utiliser dans les prochains articles le support pour Arduino.
+
+### Avantages de FreeRTOS
+
+- Chaque architecture (microcontrôleur/MCU) a ses caractéristiques et son design, donc FreeRTOS a été porté sur différentes plateformes dont le ARM, AVR, Altera, NXP, Renesas,...[liste disponible ici](https://www.freertos.org/RTOS_ports.html)
+- Utilisation efficiente de la RAM: allocation dynamique et statique de cette dernière lors de la compilation et de l'exécution basée sur l'utilisation du `heap` (tas) en évitant sa fragmentation
+- Gestionnaire de tâches et la facilité d'ajouter, supprimer et modifier l'exécution des tâches
+- L'existence des `queue` pour la communication entre les tâches: partage de données entre les tâches,...
+- La prise en charge des interruptions par exmple récupérer l'appui sur un bouton sur une broche de notre carte
+- Un système de timer, pour l'exécuter d'une fonction à une date donnéé dans le futur
+- Même une version du `delay` utilisé par les microcontrôleurs pour l'arrêt momentané du programme mais ici utilisé lors de l'exécution des tâches: `vTaskDelay()` - même fonction
+- Intégration des références de AWS (Amazon Web Services) pour les projets IoT voulant se baser sur leur cloud - à explorer
+- Le support de l'OTA (Over The Air) updates ou `mise à jour à distance du code source` via l'intégration de AWS toujours pour les systèmes supportant l'OTA - à explorer
+- Des noms de fonctions assez parlants
+- Pleins de démos sur son utilisation et le code source est totalement ouvert et gratuit à toute utilisation. Pour des options et fonctionnalités vraiment avancés des versions commerciales sont disponibles - ( _😂un ami à moi cherchera partout en gratuité la version commerciale, c'est plus fort que lui😂_ )
+
+En lisant le manuel j'avoue que la manière dont le système gère l'allocation de la mémoire est vraiment bien pensée et évite les fuites de mémoires au maximum mais aussi la fragmentation du tas d'allocation.
+Par exemple son allocation de la ram se fait en allouant simplement (je le dis ainsi) un tableau à taille fixe lors de la compilation si vous ne changer rien. Et c'est dans ce tableau
+que les différentes allocation de mémoires se feront. Différents algorithmes sont alors utilisés en fonction de vos besoins: `heap 1` à `heap 5`.
+
+### Concepts clés de FreeRTOS
+
+- Heap ou tas: "portion" de la RAM où les allocations de mémoires (variables, allocation dynamique, task,...) sont faites
+- Task ou tâches: les tâches à exécuter simultanément qui ne sont rien d'autres que des fonctions en language C - comme d'hab.
+- Queue: Système FIFO (First In First Out) de transmission de données entre les tâches (variables, pointeurs...) et même entre des tâches à exécuter dans le futur ( _awesome_ )
+- Interruption management: gestion des "interruptions" suite à un évènement le plus souvent non périodique.
+- Sémaphore (à voir).
+
+# Donc?
+
+Ok, nous venons de découvrir rapidement FreeRTOS et ses avantages mais vous pouvez consulter [le manuel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) et même [la référence](https://www.freertos.org/fr-content-src/uploads/2018/07/FreeRTOS_Reference_Manual_V10.0.0.pdf) pour en savoir plus.
+Dans un prochain article nous testerons des codes sur la carte Arduino UNO en utilisant le support de FreeRTOS pour ce dernier.
+N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont juste en dessous.
+
+Et sur ce: _can you smell what TawalMc is cooking?_
