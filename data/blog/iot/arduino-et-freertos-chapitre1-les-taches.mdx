@@ -1,0 +1,195 @@
+---
+title: 'Arduino et FreeRTOS - Chapite 1: Les tâches'
+date: '2021-06-29'
+tags: ['iot', 'arduino', 'freertos']
+draft: false
+summary: "Dans cet article nous expliquerons d'abord le concept de task en FreeRTOS et nous utiliserons ensuite le support de ce dernier sur Arduino pour créer des tâches(tasks) tournant sur l'ATmega"
+images:
+  [
+    'https://hackster.imgix.net/uploads/cover_image/file/128512/ArduinoFreeRTOSLogo.png?auto=compress%2Cformat&w=900&h=675&fit=min',
+  ]
+---
+
+_Cet article n'est que la suite de l'article introductif sur FreeRTOS que j'ai publié récemment: [Introduction à FreeRTOS](https://tawaldevuniverse.vercel.app/blog/iot/introduction-a-freertos) et donc n'est pas pour un débutant en système embarqué mais il faut juste être à l'aise avec les microcontrôleurs._
+
+![Arduino-FreeRTOS-banner](https://hackster.imgix.net/uploads/cover_image/file/128512/ArduinoFreeRTOSLogo.png?auto=compress%2Cformat&w=900&h=675&fit=min)
+
+# C'est quoi une tâche dans FreeRTOS
+
+Déjà pour ceux qui se demandent ce qu'est [FreeRTOS](https://www.freertos.org/), j'en ai déjà parlé dans mon précédent article
+où j'y présente le RTOS(Real Time Operating System) dédié aux microcontrôleurs qu'est FreeRTOS. Vous pouvez aller le lire
+rapidement: [Introduction à FreeRTOS](https://tawaldevuniverse.vercel.app/blog/iot/introduction-a-freertos) - _I'm waiting for you 😒._
+
+Une tâche ou `task` est une action que vous faites, une commande ou une routine que vous exécutez dans votre code/système.
+Et comme on parle de code, en FreeRTOS une tâche n'est rien d'autre qu'une fonction écrite en `C` qui exécute donc une/des actions(s) et qui
+ne retourne `jamais et au grand jamais` une quelconque valeur. Cette dernière partie est très importante:
+vous faites tout ce que vous voulez mais jamais de mot clé `return` sinon la _5ème grande guerre des ninjas 🤬_.
+Donc:
+
+- Afficher dans le moniteur série (Serial monitor) la valeur retournée par un capteur de température chaque 5s est une tâche
+- Eteindre et allumer une LED suivant une fréquence donnée est aussi une tâche
+- ...Bref tout ce que nous avons l'habitude de faire avec notre ami Arduino.
+
+# Caractéristiques d'une tâche
+
+Quelques notions importantes sont à prendre à compte quand on veut créer ou manipuler des tâches (je vous l'avais déjà dit, ce ne sont que des fonctions écrites en C):
+
+## `task's state` ou l'état courant d'une tâche
+
+Chaque tâche peut passer dans 4 états différents:
+
+- `Running State` : ce dit d'une tâche qui est en cours d'exécution - très courante
+- `Ready State` : ce dit d'une tâche qui n'est pas en train de s'exécuter mais est prête à entrer en exécution - état intermédiaire entre le `running state` et les autres états
+- `Blocked State` : ce dit d'une tâche qui n'est pas en cours d'exécution (bloquée) et qui attend un évènement pour débuter son exécution - un delay par exemple fait passer une tâche du `running state` au `blocked state`
+- `Suspended State` : ce dit d'une tâche qui n'est pas en cours d'exécution non plus et elle n'est pas prise en compte par le gestionnaire de tâches dans ce cas - très rares sont les applications qui l'utilisent
+
+Je vous offre une image que j'ai reproduite depuis [le guide tutoriel](https://www.freertos.org/fr-content-src/uploads/2018/07/161204_Mastering_the_FreeRTOS_Real_Time_Kernel-A_Hands-On_Tutorial_Guide.pdf) et qui montre les relations entre
+ces différents états.
+
+![each_task_state](/static/images/each_task_state.png)
+
+_Les différents états d'une tâche (j'ai volontairement supprimé certains ajouts du manuel)._
+
+## `task's priority` ou priorité d'une tâche
+
+Chaque tâche a une priorité d'exécution qui définit si elle doit s'exécuter prioritairement par rapport aux autres tâches ou si d'autres tâches ont `plus d'importance` donc doivent
+être exécutées avant cette dernière. La priorité d'une tâche est définie par un nombre allant de `0` à une valeur `max` (elle est de `3` dans le cas d'Arduino) - des précisons seront fournies lors de son utilisation.
+
+## `tick interrupt` ou interruption périodique
+
+Je vous avais dit dans l'article précédent que FreeRTOS simulait sur nos micronctrôleurs (qui n'ont qu'un seul coeur) le `multitasking`. En fait pour y arriver,
+il procède à des interruptions périodiques (`tick interrupt` ou `periodic interrupt`) où il décide de la prochaine tâche à exécuter ce qui fait croire que plusieurs tâches sont en train de s'exécuter au même moment.
+Du manuel on peut lire ceci
+
+```
+The number of tick interrupts that have occurred since the FreeRTOS
+application started is called the tick count. The tick count is used as a
+measure of time.
+```
+
+En gros il y a des interruptions périodiques qui surviennent depuis l'exécution de votre code tournant FreeRTOS et le nombre d'interruptions est
+utilisé comme échelle de mesure du temps. Vous allez remarquer par la suite que pour définir nos `delay` nous convertirons d'abord notre temps de pause
+en `tick period`. Ces interruptions se répètent chaque fois après un temps donné appelé `time slice`.
+En réalité nos tâches s'exécutent durant ce `time slice` (valeur définie dans les fichiers de configurations de `FreeRTOSConfig.h` en Hz qu'on peut rapporter en millisecondes) et à la fin de ce temps
+le `tick interrupt` survient et le gestionnaire de tâches définit alors la prochaine tâche à exécuter.
+
+_Waoh je vous assure quand je rédigeais l'article et j'ai pu expliquer avec des mots la notion de `tick interrupt`, je me suis senti comme Thor avec son marteau devant les elfes, trop coool._
+
+#### _Pour la suite j'écris le code en anglais mais les commentaires sont en français, sorry_
+
+# Halte! Trêve de bavardages, et si on créait des tasks
+
+Pour créer une tâche, il faut respecter la signature suivante
+
+```c
+/**
+*   prototype de la fonction qui représente notre tâche (elle ne renvoie rien);
+*   le paramètre pvParameters sera vu dans un prochain article
+**/
+void theNameOfTaskFunction( void *pvParameters );
+```
+
+et utiliser la fonction définie par FreeRTOS pour créer les tâches
+
+```c
+BaseType_t xTaskCreate( TaskFunction_t pvTaskCode,      /// pointeur sur la fonction-tâche: theNameOfTaskFunction dans notre cas
+                        const char * const pcName,      /// chaîne de carcatères représentant le nom de la fonction pour le debuggage uniquement (16 caractères maxi si Arduino)
+                        uint16_t usStackDepth,          /// l'espace-mémoire occupé par cette tâche, je vous avais parlé d'allocation de la mémoire par FreeRTOS pour l'exécution de tâches
+                        void *pvParameters,             /// le même paramètre passé à la fonction-tâche
+                        UBaseType_t uxPriority,         /// la priorité d'une tâche: [0;3]
+                        TaskHandle_t *pxCreatedTask );  /// un pointeur sur la tâche pour des utilisations ultérieures, par exemple la supprimée.
+```
+
+`BaseType_t`, `TaskFunction_t`, `UBaseType_t`, `TaskHandle_t`, `...` sont juste des types définis par FreeRTOS reposant sur les types primitifs disponibles
+en C et qui peuvent varier selon l'architecture (8bits, 16bits, ...) et qui leur permet d'avoir une consistence dans leur code. _Don't be afraid 😈_
+
+## Et Arduino dans le lot
+
+Bien nous allons créer deux tâches simples
+
+- Afficher un texte "Hi Embedded World!" chaque seconde dans le Serial monitor d'Arduino - `tâche 1`
+- Clignoter une LED chaque 3s - `tâche 2`
+
+### Installation de FreeRTOS sous Arduino
+
+Elle est très simple:
+
+1. Dans le gestionnaire de librairies (libraries manager) sous l'onglet outils (tools) de l'IDE Arduino
+2. Chercher `FreeRTOS` et installer cette dernière (le premier résultat de la recherche)
+
+Nous allons tester le code suivant
+
+```c
+#include <Arduino_FreeRTOS.h>
+
+void TaskPrintText  (void *pvParameters);   /// prototype de la tâche 1 affichant: Hi Embedded World!
+void TaskBlink      (void *pvParameters);   /// prototype de la tâche 2 faisant clignoter la led LED_BUILTIN (led 13 qui se trouve sur la carte Arduino)
+
+void setup()
+{
+  Serial.begin(9600);
+  while (!Serial)
+  {
+    ;
+  }
+
+  /// Tâche 1
+  xTaskCreate(
+    TaskPrintText,
+    "PrintText",    /// vous pouvez donner n'importe quel nom, FreeRTOS ne l'utilise pas. C'est juste pour le debuggage
+    128,            /// taille de l'allocation de la mémoire que la tâche va utiliser, je la laise aussi à 128
+    NULL,           /// notre fonction ne prend rien en paramètre donc ici on passe juste un NULL
+    1,              /// tâche de priorité 1. Une tâche de priorité élevée sera toujours exécutée au détriment des tâches de priorités à moins de passer à un état bloquant
+    NULL);          /// nous ne prévoyons pas utiliser un pointeur sur cette tâche pour des utilisations ultérieures donc on passe juste NULL
+
+  /// Tâche 2
+  xTaskCreate(
+    TaskBlink,
+    "Blink",
+    128,
+    NULL,
+    1,              /// cette tâche aussi a la même priorité que la précédente pour être sûr qu'elle s'exécutera
+    NULL);
+}
+
+void loop()
+{
+  /// nous ne mettons rien ici
+}
+
+void TaskPrintText(void *pvParameters)
+{
+  (void)pvParameters;
+
+    /// une boucle infinie comme le loop habituel, mais ne comportant pas de return
+  for (;;)
+  {
+    Serial.println("Hi Embedded World!");
+  }
+}
+
+void TaskBlink(void *pvParameters)
+{
+  (void)pvParameters;
+
+  pinMode(LED_BUILTIN, OUTPUT);
+
+    /// une boucle infinie comme le loop habituel, mais ne comportant pas de return
+  while (1)
+  {
+    digitalWrite(LED_BUILTIN, HIGH);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); /// delay de 1s: conversion de 1000ms en tick period dont j'avais parlé
+    digitalWrite(LED_BUILTIN, LOW);
+    vTaskDelay(1000 / portTICK_PERIOD_MS); /// delay de 1s: conversion de 1000ms en tick period dont j'avais parlé
+  }
+}
+```
+
+# Alors
+
+Voilà on a fait un tour de la notion de tâche et de quelques concepts qui lui sont liés. J'avoue que cet article est un peu long, et nous n'avions pas
+vraiment testé les différentes possibilités offertes par FreeRTOS à travers les tâches. Mais je vous le promets, les prochains articles (au moins 2) porteront
+uniquement sur les tâches et leur utilisation avec Arduino: comment communiquer entre deux tâches, des cas d'utilisation du rtos avec le module
+rfid ou clock...Je vous prépare du lourd quand même.N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont en dessous.
+
+Et sur ce: _can you smell what TawalMc is cooking?_
