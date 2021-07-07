@@ -1,0 +1,258 @@
+---
+title: 'Arduino et FreeRTOS - Chapite 1: Les tâches (suites)'
+date: '2021-07-06'
+tags: ['iot', 'arduino', 'freertos']
+draft: false
+summary: "Dans cet article nous irons un peu plus en profondeur ce qui concerne l'utilisation des tâches de FreeRTOS en Arduino"
+images:
+  [
+    'https://hackster.imgix.net/uploads/cover_image/file/128512/ArduinoFreeRTOSLogo.png?auto=compress%2Cformat&w=900&h=675&fit=min',
+  ]
+---
+
+# Notre objectif
+
+Nous allons nous baser sur un circuit très simple mais en mettant l'accent sur le fonctionnement et l'utilisation des tâches en FreeRTOS.
+
+## Test 1: RFID-RC522 et Serial Monitor + LED (2 tâches)
+
+Dans celui ci:
+
+- Le module RC-522 identifie l'ID des cartes RFID/badges et l'affiche dans le Serial monitor `tâche 1` - _(on va les départager par la suite pour en faire deux tâches distinctes 😈)_
+- La LED sera en train de clignoter `tâche 2`
+
+La LED est reliée au pin A0 (ne pas oublier la résistance ohmique) et le câblage du module RC-522 est le suivant
+
+| RFID | Arduino |
+| ---- | ------- |
+| 3.3V | 3.3V    |
+| RST  | D9      |
+| GND  | GND     |
+| RQ   | -       |
+| MISO | D12     |
+| MOSI | D11     |
+| SCK  | D13     |
+| SDA  | D10     |
+
+Vou pouvez jeter un coup d'oeil rapide sur l'image suivante
+
+![Schematic_freertos_rfid_led_2021-07-06.svg](/static/images/Schematic_freertos_rfid_led_2021-07-06.png)
+
+Si c'est bon nous pouvons débuter la partie code.
+
+1. On inclut les entêtes
+
+```C
+#include <Arduino.h>
+#include <Arduino_FreeRTOS.h> // Need for FreeRTOS with Arduino
+#include <SPI.h>              // RFID communicate with Arduino via SPI
+#include <MFRC522.h>          // Need to use RFID utilities
+```
+
+2. On définit les ports
+
+```C
+const uint8_t ss = 10;
+const uint8_t rst = 9;
+const uint8_t led = A0; // led pin
+
+MFRC522 rfid(ss, rst);
+```
+
+3. On définit les prototypes des fonctions: `tâches` et fonctions simples - _(j'en ai l'habitude surtout quand je compte faire des surcharges de fonctions)_
+
+```C
+////////////////////////////////////
+///////// Task prototype ///////////
+////////////////////////////////////
+void TaskRfidRead(void *pvParameters);    // task to read rfid
+void TaskBlinking(void *pvParameters);    // task to blink led
+void TaskSerialPrint(void *pvParameters); // task to print in serial
+
+////////////////////////////////////
+/////// Utilities functions ////////
+////////////////////////////////////
+String getRfidID(byte *buffer, byte bufferSize); // to format and return the rfid id
+```
+
+Reamarquez ici que nos tâches on un prototype bien connu: elles prennent en paramètre un `pointeur générique` _(peut pointer ensuite sur n'importe quel type de données)_. Certes
+nous n'allons pas l'utiliser mais il reste important ce paramètre.
+
+4. Le fameux `void setup()`
+
+```C
+void setup()
+{
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+
+  SPI.begin();      // Init SPI bus
+  rfid.PCD_Init();  // Init MFRC522
+
+  // tasks creation. We can verify if task has been successfully created
+  // so we can log some messages
+
+  if (xTaskCreate(TaskRfidRead, "rfid-reader", 128, NULL, 1, NULL) == pdFAIL)
+  {
+    Serial.println("cannot create task: rfid-reader");
+  }
+
+  if (xTaskCreate(TaskBlinking, "blinking", 128, NULL, 1, NULL) == pdFAIL)
+  {
+    Serial.println("cannot create task: blinking");
+  }
+
+  vTaskStartScheduler(); // Start the scheduler so the tasks start executing
+}
+```
+
+Pour ceux qui avaient lu l'article précédent (celui introduisant les tâches avec Arduino), ils remarqueront un petit
+changement lors de la création des tâches. Prenons le cas de la création de la tâche `rfid-reader`:
+
+```C
+if (xTaskCreate(TaskRfidRead, "rfid-reader", 128, NULL, 1, NULL) == pdFAIL)
+{
+  Serial.println("cannot create task: rfid-reader");
+}
+```
+
+Cette fois ci, si nous vérifions si la création de la tâche s'est déroulée normalement. `xTaskCreate` renvoie `pdFAIL`
+si la tâche n'a pas été créée. EN plein processus de débuggage je pense que cela servirait.
+Aussi les deux tâches ont été créées avec le même niveau de priorité `(task priority)`: 1. Ceci implique que nous sommes
+sûr que les deux tâches s'exécuterons en se basant sur le `tick period`.
+
+5. Le `void loop()`, le malheureux reste vide.
+
+```C
+void loop()
+{
+  // put your main code here, to run repeatedly: NOTHING HERE
+}
+```
+
+6. Impémentation de la tâche `rfid-reader`
+
+```C
+////////////////////////////////////
+///////// Task implementation //////
+////////////////////////////////////
+
+// task to read rfid
+void TaskRfidRead(void *pvParameters) {
+  (void) pvParameters;
+
+  for(;;) {
+
+    if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+      String rfidID = getRfidID(rfid.uid.uidByte, rfid.uid.size);
+
+      Serial.print("rfidID: "); Serial.println(rfidID);
+    }
+  }
+
+}
+```
+
+7. Impémentation de la tâche `blinking`
+
+```C
+// task to blink led
+void TaskBlinking(void *pvParameters) {
+  (void) pvParameters;
+
+  pinMode(led, OUTPUT);
+
+  for(;;) {
+    digitalWrite(led, HIGH);
+    vTaskDelay( pdMS_TO_TICKS(200) );
+    digitalWrite(led, LOW);
+    vTaskDelay( pdMS_TO_TICKS(200) );
+  }
+}
+```
+
+`vTaskDelay` joue le même rôle que l'éternel `delay` juste que `vTaskDelay` fait passer la tâche concernée dans le `blocked state`
+donc la tâche ne s'éxécute plus et il prend en paramètre le nombre de tick period (expliqué dans l'article précédent). Et pour cela
+on utilise `pdMS_TO_TICKS` qui prend en paramètre la durée d'attente et retourne le `tick period`.
+
+8. Fonction de formatage des ID des cartes
+
+```C
+////////////////////////////////////
+/////// Utilities functions ////////
+////////////////////////////////////
+
+String getRfidID(byte *buffer, byte bufferSize) {
+  String uidRead = "";
+
+  for (byte i = 0; i < bufferSize; i++) {
+    uidRead += buffer[i] < 0x10 ? " 0" : " ";
+    uidRead += String(buffer[i], HEX);
+  }
+  uidRead.toUpperCase();
+
+  return uidRead;
+}
+```
+
+Exécutez le code et admirez le réal-time offert par FreeRTOS. Observez correctement les sorties du moniteur et l'allumage de
+la led, nous en aurons besoin pour la suite.
+
+#### Conclusion 1:
+
+Quand nous passons uen carte, son ID s'affiche plusieurs fois dans le serial monitor
+(notre code ne prend pas en charge ce cas).Nous pouvons le contourner (sera fait après) avec un vTaskDelay. Blinking marche correctement.
+
+## Test 2: RFID-RC522 et Serial Monitor + LED (2 tâches + différentes priorités)
+
+Alors dans un premier cas nous allons:
+
+1. Augmenter la priorité de `rfid-reader`
+
+```C
+if (xTaskCreate(TaskRfidRead, "rfid-reader", 128, NULL, 2, NULL) == pdFAIL)
+{
+  Serial.println("cannot create task: rfid-reader");
+}
+```
+
+On remarque que la led ne s'allume même plus: la tâche `blinking` a une priorité inférieure à celle de `rfid-reader` so elle
+reste dans le `blocked state` alors que la première est dans le `running state`. En réalité à chaque `tick interrupt`, le gestionnaire
+de tâche détermine la prochaine tâche à exécuter et comme `rfid-reader` a une priorité élevée _(😈 peut être que Thanos s'apprête à envahir la terre se dit il 😈)_
+elle l'exécute à chaque fois. Ramenez juste la priorité de la tâche `blinking` à 2 et vous verrez qu'on aura le même fonctionnement que le premier test
+(la led s'allume et s'éteint).
+
+## Test2: RFID-RC522 et Serial Monitor + LED (2 tâches + différentes priorités)
+
+Cette fois ci nous allons ajouter le vTaskDelay à `rfid-reader` juste après l'affichage dans le serial (dans le if). Cela empêchera les affichages en boucle de la même ID en quelques
+secondes mais aussi...à la tâche `blinking` de s'exécuter chaque fois que `rfid-reader` passe dans le `blocked state` car le
+gestionnaire de tâche en ce moment comprendra/verra _(qu'est ce qu'il y peut, même les Avengers avaient échoué le première fois)_ la tâche `blinking` en attente.
+
+#### Une remarque: Quand deux tâches sont en attentes d'exécution, celle avec la plus grande priorité sera choisie. Si les deux ont le même niveau de priorité alors celle ayant attendue le plus sera choisie.
+
+#### Conclusion 2:
+
+L'idéal _(utopique)_ alors est d'avoir le même niveau de priorité pour les tâches ou alors de faire basculer des tâches de priorité élevée
+dans le blocked state pour permettre aux tâches de priorités inférieures de s'exécuter.
+
+## Test 3: RFID-RC522 + Serial Monitor + LED (3 tâches)
+
+Bref ici c'est un exercice pour la prochaine fois:
+
+- Nous devons créer trois tâches: l'une pour receuillir l'ID de la carte, l'autre pour afficher cet ID, l'autre pour le blinking.
+
+Essayez de le réaliser, moi je vais pour cela utiliser un autre concept de FreeRTOS. Je ne vous le dit pas, mais la logique est
+`de passer l'ID à la tâche qui l'affiche uniquement quand il y a ID`. En lisant l'article introductif sur FreeRTOS vous verrez le mot.
+
+# Alors
+
+J'avoue qu'avec ces exemples nous ne remarquons pas vraiment l'importance de FreeRTOS, mais regadez le code:
+
+- Nous exécutons des actions sans pour autant appeler des fonctions les unes après les autres - _(nous avons acquis notre indépendance)_
+- Chaque tâche à l'air de ne pas se `sentir` concernée par ce que fait l'autre tâche
+- Nous pouvons explicitement indiquer l'importance de l'exécution d'une fonction, quand elle peut s'exécuter explicitement sans se soucier de `millis()` ou du retour d'une fonction
+  bref les possibilités sont incroyables surtout avec les...
+  Au passage j'utilise `VSCode + platformIO`(pour ceux que cela interesse). Je vous prépare du lourd pour la prochaine fois. N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont en dessous
+  ou simplement cliquer sur `Discutons en sur Twitter •`.
+
+Et sur ce: _can you smell what TawalMc is cooking?_

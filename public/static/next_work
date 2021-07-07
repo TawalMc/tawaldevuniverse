@@ -1,0 +1,24 @@
+
+## Projet 1 (sans vTaskDelay)
+- FreeRTOS
+- Lecture de cartes RFID et affichage dans le Serial
+- Blinking led
+
+## Projet 2 (avec vTaskDelay)
+- FreeRTOS
+- Blinking led (RGB)
+- Affichage de l'heure sur un écran LCD
+- Affichage de la valeur renvoyée par un potentiomètre dans le Serial
+
+## Project 3 (introduction aux queues)
+- FreeRTOS
+- Lecture de la carte RFID
+- Affichage sur écran LCD qui affichait juste l'heure
+
+## Projet 4 (queues)
+- FreeRTOS
+- Envoie d'ordres par Apk android vers Bluetooth - Arduino
+- Reception de l'ordre et exécution (LED)
+- Reception de l'ordre et exécution (LCD - message)
+- Envoie d'ordres par Bluetooth - Arduino vers Apk
+ 
