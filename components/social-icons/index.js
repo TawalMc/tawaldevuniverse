@@ -7,6 +7,8 @@ import Twitter from './twitter.svg'
 
 // Icons taken from: https://simpleicons.org/
 
+import * as ga from '../../lib/ga'
+
 const components = {
   mail: Mail,
   github: Github,
@@ -21,12 +23,22 @@ const SocialIcon = ({ kind, href, size = 8 }) => {
 
   const SocialSvg = components[kind]
 
+  const socialView = () => {
+    ga.event({
+      action: 'select_content',
+      params: {
+        content_type: kind,
+      },
+    })
+  }
+
   return (
     <a
       className="text-sm text-gray-500 transition hover:text-gray-600"
       target="_blank"
       rel="noopener noreferrer"
       href={href}
+      onClick={socialView}
     >
       <span className="sr-only">{kind}</span>
       <SocialSvg
