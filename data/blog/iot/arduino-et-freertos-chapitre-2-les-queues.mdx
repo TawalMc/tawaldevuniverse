@@ -1,0 +1,317 @@
+---
+title: 'Arduino et FreeRTOS - Chapite 2: Les queues'
+date: '2021-07-12'
+tags: ['iot', 'arduino', 'freertos']
+draft: false
+summary: 'Dans cet article nous parlerons de la transmission de donnée/informations entre les tâches: Les Queues'
+images:
+  [
+    'https://hackster.imgix.net/uploads/cover_image/file/128512/ArduinoFreeRTOSLogo.png?auto=compress%2Cformat&w=900&h=675&fit=min',
+  ]
+---
+
+#### _Je voudrais préciser que tout le blog et mes futurs articles (d'ici la fin de ce mois) seront en anglais et plus en français. Désolé de l'annoncer ainsi mais je présenterai bientôt les raisons._
+
+_Cet article n'est que la suite de l'article sur l'utilisation des tâches de FreeRTOS en Arduino que j'ai publié récemment et donc n'est pas pour un débutant en système embarqué mais il faut juste être à l'aise avec les microcontrôleurs._
+
+![Arduino and FreeRTOS banner](https://hackster.imgix.net/uploads/cover_image/file/128512/ArduinoFreeRTOSLogo.png?auto=compress%2Cformat&w=900&h=675&fit=min)
+
+Des deux articles précédents vous allez remarquer que pour transmettre des informations entre les tâches nous utilisons
+nos bonnes vieilles variables globales. Donc quand une tâche met à jour une variable globale, les autres tâches
+qui utilisent cette variable auront les `nouvelles valeurs de cette variable`. Sérieusement ? Bon disons pas tout à fait.
+
+# Et quel est le problème alors ?
+
+En fait:
+
+- Si une tâche de priorité élevée modifie plusieurs fois une variable alors une tâche de priorité faible doit
+  dans la plus part des cas attendre que la tâche de priorité élevée passe dans un état bloquant pour pouvoir ainsi
+  s'exécuter et donc accéder à la nouvelle valeur de la variable. Mais dans ce cas, a t-elle vraiment accès à toutes
+  les valeurs de la variable ?
+- Etant donné qu'une tâche s'exécute un nombre de fois donné suivant le `tick period` cela implique aussi que si cette
+  variable est modifiée plusieurs fois, même une tâche de priorité égale n'aura pas automatiquement accès aux nouvelles
+  valeurs de cette variable.
+
+L'idéal serait alors d'envoyer explicitement les nouvelles valeurs à une tâche ou notifiée cette dernière de la disponibilité
+de nouvelles valeurs de la variable à chaque moment où il le faut. Bien cela nous amène vers notre sujet du jour: `Les queues`.
+
+# Les queues: nouveau concept, nouveau discours
+
+Une queue est un mécanisme mise en place par FreeRTOS pour résoudre les problèmes évoqués plus haut _(ça on l'a compris 😎)_.
+En réalité une `queue` comme son nom l'indique représente un système FIFO (First In FIrst Out) où des données (variables)
+sont envoyées depuis une ou plusieurs tâches vers une ou plusieurs autres tâches. C'est disons un canal de communication entre
+les tâches où on s'assure que l'ordre d'envoi des données est respectée à la réception par les tâches. Donc à un instant t
+nous sommes sûrs que la valeur courante de la variable est envoyée dans la `queue` pour être récupérée par la tâche(fonction)
+qu'il faut. Jetez un coup d'oeil à l'image que j'ai tirée de la documentation:
+
+![Tasks and queue](/static/images/tasks_queue.png)
+
+## Différents types d'implémentations des queues
+
+Il y a deux manières principalement d'implémenter les queues:
+
+- queue par copie: les données sont copiées dans la queue
+- queue par référence: chaque donnée a un pointeur qui est passé à la queue
+
+Ci-dessous le prototype de la fonction de création d'une queue:
+
+```C
+QueueHandle_t xQueueCreate( UBaseType_t uxQueueLength, UBaseType_t uxItemSize );
+```
+
+1. uxQueueLength: le `nombre maximal d'éléments/données` que la queue à un instant t peut contenir
+2. uxItemSize: la taille en `byte` de chaque élément à stocker dans la queue
+3. la valeur retournée doit être stockée: NULL si la queue n'a pas été créée (insuffisance de mémoire) et une valeur non NULL indique que la queue a vraiment été créée et on peut utiliser le retour pour accéder à la queue.
+
+Pour envoyer des données dans la queue:
+
+```C
+BaseType_t xQueueSend( QueueHandle_t xQueue,          // the queue used to send data
+                        const void * pvItemToQueue,   // pointer to data to send
+                        TickType_t xTicksToWait );    // amount of time to wait in blocked state for availability of space in queue
+```
+
+Il y a d'autres fonctions d'envoi de données dans une queue comme `xQueueSendToFront` ou `xQueueSendToBack` que vous
+pouvez explorer.
+
+Pour reçevoir des données de la queue:
+
+```C
+BaseType_t xQueueReceive( QueueHandle_t xQueue,       // the queue used to send data
+                          void * const pvBuffer,      // pointer to data to send
+                          TickType_t xTicksToWait );  // amount of time to wait in blocked state for availability of data in queue
+```
+
+## Et si on faisait un essai?
+
+Nous allons utiliser le câblage de [l'article précedent](https://tawaldevuniverse.vercel.app/blog/iot/arduino-et-freertos-chapitre1-les-taches-suites) sur les tâches:
+RFID-RC522 + Serial Monitor + LED (3 tâches). Donc:
+
+- Le module RC-522 identifie l'ID des cartes RFID/badges `(tâche 1)` et l'envoie à une autre tâche qui l'affiche dans le Serial monitor `(tâche 2)`
+- La LED sera en train de clignoter `(tâche 3)`
+
+La LED est reliée au pin A0 (ne pas oublier la résistance ohmique) et le câblage du module RC-522 est le suivant
+
+| RFID | Arduino |
+| ---- | ------- |
+| 3.3V | 3.3V    |
+| RST  | D9      |
+| GND  | GND     |
+| RQ   | -       |
+| MISO | D12     |
+| MOSI | D11     |
+| SCK  | D13     |
+| SDA  | D10     |
+
+Ainsi on a:
+
+1. Nos initialisations et includes
+
+```C
+#include <Arduino.h>
+#include <Arduino_FreeRTOS.h>  // Need for FreeRTOS with Arduino
+#include <queue.h>             // Need to use FreeRTOS queue
+#include <MFRC522.h>           // Need to use RFID utilities
+#include <SPI.h>               // RFID communicate with Arduino via SPI
+
+const uint8_t ss = 10;
+const uint8_t rst = 9;
+
+MFRC522 rfid(ss, rst);
+
+const uint8_t led = A0;  // led pin
+```
+
+2. Le prorotype de nos tâches
+
+```C
+////////////////////////////////////
+///////// Task prototype ///////////
+////////////////////////////////////
+void TaskRfidRead(void *pvParameters);     // task to read rfid
+void TaskBlinking(void *pvParameters);     // task to blink led
+void TaskSerialPrint(void *pvParameters);  // task to print in serial
+```
+
+3. Déclaration de la variable qui contiendra la queue
+
+```C
+////////////////////////////////////
+//////// Queue /////////////////////
+////////////////////////////////////
+QueueHandle_t stringQueuePrint;  // our queue to handle rfid string
+```
+
+4. Quelques fonctions utilisées lors de la lecture des ID
+
+```C
+////////////////////////////////////
+/////// Utilities functions ////////
+////////////////////////////////////
+String getRfidID(byte *buffer,
+                 byte bufferSize);  // to format and return the rfid id
+
+```
+
+5. Le void setup
+
+```C
+void setup() {
+  // put your setup code here, to run once:
+
+  Serial.begin(9600);
+
+  SPI.begin();      // Init SPI bus
+  rfid.PCD_Init();  // Init MFRC522
+
+  // queue creation. We'll hold queue return value to used it after
+  // (2)
+  stringQueuePrint = xQueueCreate(
+      10,             // queue length - we can hold 10 values at one time
+      sizeof(String)  // each element of queue has sizeof(String) byte size
+  );
+
+  // tasks creation.
+  // We'll create them if only queue is created
+  // We can verify if task has been successfully created so we can log some
+  // messages
+
+  // (2)
+  if (stringQueuePrint != NULL) {
+    Serial.println("Queue succesfully created");
+
+    if (xTaskCreate(TaskRfidRead, "rfid-reader", 128, NULL, 1, NULL) ==
+        pdFAIL) {
+      Serial.println("cannot create task: rfid-reader");
+    }
+
+    if (xTaskCreate(TaskSerialPrint, "print", 128, NULL, 1, NULL) == pdFAIL) {
+      Serial.println("cannot create task: print");
+    }
+  }
+
+  // blinking task is independant to other tasks
+  // (3)
+  if (xTaskCreate(TaskBlinking, "blinking", 128, NULL, 1, NULL) == pdFAIL) {
+    Serial.println("cannot create task: blinking");
+  }
+
+  vTaskStartScheduler();
+}
+```
+
+Remarquez ici:
+
+- `(1)`: je récupère dans la variable un pointeur sur la queue
+- `(2)`: on s'assure que la queue a été vaiment créée afin de créer ou pas les tâches qui l'utilisent
+- `(3)`: notre fonction de blinking est indépendante des deux autres
+
+6. Comme d'habitude rien dans le void loop, le pauvre
+
+```C
+void loop() {
+  // put your main code here, to run repeatedly: NOTHING HERE
+}
+```
+
+7. La fonction de lecture de l'ID de la carte RFID
+
+```C
+// task to read rfid
+void TaskRfidRead(void *pvParameters) {
+  (void)pvParameters;
+
+  String rfidID = "";
+  String pastRfidID = "";
+  uint8_t count = 0;
+
+  for (;;) {
+    if (rfid.PICC_IsNewCardPresent() && rfid.PICC_ReadCardSerial()) {
+      rfidID = getRfidID(rfid.uid.uidByte, rfid.uid.size);
+
+      if (pastRfidID == rfidID) {
+        count += 1;
+      } else {
+        count = 0;
+      }
+
+      if ( (count % 50) == 0) {
+        BaseType_t statusSend = xQueueSend(stringQueuePrint, &rfidID, 0);
+
+        if( statusSend != pdPASS ) {
+          Serial.println("rfid-reader cannont send data to queue");
+        }
+
+        pastRfidID = rfidID;
+        count = 0;
+      }
+    }
+  }
+}
+```
+
+Vous remarquerez ici que j'ai ajouté quelques lignes de codes et une condition sur le nombre de fois
+on lit l'ID: en fait sans ce bout de code, la carte rfid renvoie à la milliseconde le même ID le temps
+que la carte ne soit présentée donc je m'assure d'un nombre de lecture donné (0 ou 50) à chaque fois avant
+d'envoier l'ID à la tâche concernée. Un message est renvoyée si l'envoi échoue.
+
+8. Celle de l'affichage de l'ID
+
+```C
+// task to print
+void TaskSerialPrint(void *pvParameters) {
+  (void)pvParameters;
+
+  String rfidID = "";
+
+  for (;;) {
+    if (xQueueReceive(stringQueuePrint, &rfidID, 0) == pdPASS) {
+      Serial.print("rfidID: "); Serial.println(rfidID);
+    }
+  }
+}
+```
+
+Elle est toute simple: affiche l'ID si elle est disponible dans la queue.
+
+9. Et l'implémentation de la fonction de traitement de l'ID
+
+```C
+////////////////////////////////////
+/////// Utilities functions ////////
+////////////////////////////////////
+
+String getRfidID(byte *buffer, byte bufferSize) {
+  String uidRead = "";
+
+  for (byte i = 0; i < bufferSize; i++) {
+    uidRead += buffer[i] < 0x10 ? " 0" : " ";
+    uidRead += String(buffer[i], HEX);
+  }
+  uidRead.toUpperCase();
+
+  return uidRead;
+}
+```
+
+10. Run the code...
+
+Ok compilez et admirez!
+
+#### NB: Il y a un petit problème pour ceux qui auront compilé le code, ils le remarqueront alors c'est lequel? On en discute sur mon twitter...
+
+# Ensuite
+
+Nous venons d'explorer un aspect des queues, il reste encore d'autres manières de les utiliser que nous découvrirons
+peut être dans les prochains TP comme:
+
+- Envoyer des structures à la queue donc différents type de données - (pointeur sur stucture)
+- Envoyer des données dans plusieurs queues et en recevoir de différentes queues...
+
+C'est toujours interessant d'explorer des documentations et de nouvelles technologies et c'est surtout interessant de
+partager nos découvertes et de les appliquer. Pour la suite je pense à parler d'un autre aspect de FreeRTOS ou
+de réaliser un projet utilisant tout ce que nous venons d'apprendre sur le système et permettant de découvrir d'autres
+notions. Je vous prépare du lourd pour la prochaine fois. N'hésitez pas à me faire des retours dans mon mail ou sur mon Twitter ou Linkedin dont les références sont en dessous
+ou simplement cliquer sur `Partager sur Twitter • LinkedIn`.
+
+Et sur ce: _can you smell what TawalMc is cooking?_
