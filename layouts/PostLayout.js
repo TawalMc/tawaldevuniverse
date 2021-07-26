@@ -30,7 +30,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
             <div className="space-y-1 text-center">
               <dl className="space-y-10">
                 <div>
-                  <dt className="sr-only">Publié sur</dt>
+                  <dt className="sr-only">Published on</dt>
                   <dd className="text-base font-medium leading-6 text-gray-500 dark:text-gray-400">
                     <time dateTime={date}>
                       {new Date(date).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
@@ -48,13 +48,13 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
             style={{ gridTemplateRows: 'auto 1fr' }}
           >
             <dl className="pt-6 pb-10 xl:pt-11 xl:border-b xl:border-gray-200 xl:dark:border-gray-700">
-              <dt className="sr-only">Auteurs</dt>
+              <dt className="sr-only">Authors</dt>
               <dd>
                 <ul className="flex justify-center space-x-8 xl:block sm:space-x-12 xl:space-x-0 xl:space-y-8">
                   <li className="flex items-center space-x-2">
                     <img src={siteMetadata.image} alt="avatar" className="w-10 h-10 rounded-full" />
                     <dl className="text-sm font-medium leading-5 whitespace-nowrap">
-                      <dt className="sr-only">Nom</dt>
+                      <dt className="sr-only">Name</dt>
                       <dd className="text-gray-900 dark:text-gray-100">{siteMetadata.author}</dd>
                       {typeof siteMetadata.twitter === 'string' && (
                         <>
@@ -78,7 +78,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
               <div className="pt-10 pb-8 prose dark:prose-dark max-w-none">{children}</div>
               <div className="pt-6 pb-6 text-sm text-gray-700 dark:text-gray-300">
                 <Link href={discussUrl(title, slug)} rel="nofollow">
-                  {'Partager sur Twitter'}
+                  {'Share on Twitter'}
                 </Link>
                 {` • `}
                 <Link href={postLinkedIn(title, slug)}>{'LinkedIn'}</Link>
@@ -103,7 +103,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
                     {prev && (
                       <div>
                         <h2 className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                          Article Précédent
+                          Previous Article
                         </h2>
                         <div className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
                           <Link href={`/blog/${prev.slug}`}>{prev.title}</Link>
@@ -113,7 +113,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
                     {next && (
                       <div>
                         <h2 className="text-xs tracking-wide text-gray-500 uppercase dark:text-gray-400">
-                          Prochain Article
+                          Next Article
                         </h2>
                         <div className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400">
                           <Link href={`/blog/${next.slug}`}>{next.title}</Link>
@@ -128,7 +128,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
                   href="/blog"
                   className="text-blue-500 hover:text-blue-600 dark:hover:text-blue-400"
                 >
-                  &larr; Revenir au Blog
+                  &larr; Return to Blog
                 </Link>
               </div>
             </footer>

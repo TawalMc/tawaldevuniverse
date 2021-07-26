@@ -1,7 +1,7 @@
 const projectsData = [
   {
-    title: 'Mes projets',
-    description: `Sur ce lien, je fais une liste des projets que j'ai réalisé avec leur description, le lien vers le code source et les démos.`,
+    title: 'My projects',
+    description: `Here is a link to projects that I built. You can read more about them, try a demo and view the source code.`,
     imgSrc: '/static/images/github.png',
     href: 'https://github.com/TawalMc/portfolio',
   },

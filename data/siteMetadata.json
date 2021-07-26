@@ -2,8 +2,8 @@
   "title": "Tawal Dev Universe",
   "author": "Tawaliou ALAO",
   "headerTitle": "Tawal Dev Universe",
-  "description": "Mon univers en tant que développeur.",
-  "language": "fr",
+  "description": "My universe as developer.",
+  "language": "en",
   "siteUrl": "https://tawaldevuniverse.vercel.app/",
   "siteRepo": "https://github.com/TawalMc/tawaldevuniverse",
   "image": "/static/images/avatar.png",
@@ -15,5 +15,5 @@
   "facebook": "",
   "youtube": "",
   "linkedin": "https://www.linkedin.com/in/tawaliou-alao-26688614b/",
-  "locale": "fr-FR"
+  "locale": "en-US"
 }
