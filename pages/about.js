@@ -13,7 +13,7 @@ export default function About() {
       <div className="divide-y">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Qui suis je?
+            Who am I?
           </h1>
         </div>
         <div className="items-start space-y-2 xl:grid xl:grid-cols-3 xl:gap-x-8 xl:space-y-0">
@@ -22,8 +22,12 @@ export default function About() {
             <h3 className="pt-4 pb-2 text-2xl font-bold leading-8 tracking-tight">
               {siteMetadata.author}
             </h3>
-            <div className="text-gray-500 dark:text-gray-400">Ingénieur en énergie et procédés [systèmes embarqués].</div>
-            <div className="text-gray-500 dark:text-gray-400">Passionné de l'IoT, de la programmation informatique et de l'univers du dev logiciel.</div>
+            <div className="text-gray-500 dark:text-gray-400">
+              Power and Process Engineer [Embedded Systems/IoT].
+            </div>
+            <div className="text-gray-500 dark:text-gray-400">
+              Passionate about IoT, computer programming and the world of software dev.
+            </div>
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} />
               <SocialIcon kind="github" href={siteMetadata.github} />
@@ -35,26 +39,35 @@ export default function About() {
           </div>
           <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">
             <p>
-              Je m'appelle Tawaliou ALAO et je suis un jeune ingénieur en génie énergétique et procédés orienté systèmes embarqués et IoT.
-              Je suis actuellement stagiaire à YoupiLab et je réside au Bénin. 
-              J'aime la programmation informatique et j'explore l'univers du développement logiciel pour y découvir...peut être des extra-terrestres🤣.
+              My name is Tawaliou ALAO and I am a young engineer in energy and process engineering
+              focused on embedded systems and IoT. I am currently an intern at YoupiLab and I live
+              in Benin. I love computer programming and I explore the world of software development
+              to discover ... maybe aliens
+              <span role="img" aria-label="smile">
+                🤣
+              </span>
+              .
             </p>
             <p>
-              Ecrire du code me permet de m'exprimer, de réflchir et de voir, de réaliser ce qui me traverse l'esprit. 
-              Je peux tester mes idées, changer ma façon de voir. 
-              Mais au delà de tout, la programmation informatique pour moi est comme une aventure où atteindre le panthéon des développeurs innovateurs,
-              ayant changés le cours de l'histoire est un objectif clé... 🧐. 
-              L'utiliser dans le domaine de l'énergie ou tout autre d'autre n'est que ma vision.
+              Writing code allows me to express myself, to think and to see, to realize what crosses
+              my mind. I can test my ideas, change my outlook. But above all, computer programming
+              for me is like an adventure to reach the pantheon of innovative developers, having
+              changed the course of history is a key objective ...{' '}
+              <span role="img" aria-label="look at">
+                🧐
+              </span>
+              . Using it in the field of energy or any other is just my vision.
             </p>
             <p>
-              Je suis un fan du language C++ que j'utilise en dans les systèmes embarqués (programmation des microcontrôleurs, IoT,...)
-              et dont j'explore les utilisations. Je m'approprie actuellement Kotlin pour pouvoir développer des applications
-              mobiles IoT (Android) robustes et fiables. 
-              J'aime et j'utilise beaucoup le JavaScript. Parce qu'il me permet d'être fullstack mais aussi d'être indépendant
-              et de concrétiser rapidement mes idées d'applications web et mobile multiplateforme à travers React 
-              (mon framework JS préféré), ReactNative et l'éternel NodeJS (c'est trop cool ce runtime) 
-              que j'utilise pour la mise en place de serveur web. 
-              De ce fait je peux penser une architecture IoT complète: depuis le matériel jusqu'à la plateforme web en passant par l'application mobile.
+              I am a fan of the C ++ language that I use in embedded systems (programming
+              microcontrollers, IoT, ...) and whose uses I explore. I am currently appropriating
+              Kotlin to be able to develop robust and reliable IoT (Android) mobiles applications. I
+              like and use JavaScript a lot. Because it allows me to be fullstack but also to be
+              independent and quickly realize my ideas for cross-platform web and mobile
+              applications through React (my favorite JS framework), ReactNative and the eternal
+              NodeJS (it's so cool this runtime) that I use for setting up web server. So I can
+              think of a complete IoT architecture: from the hardware to the web platform via the
+              mobile application.
             </p>
           </div>
         </div>
