@@ -12,7 +12,7 @@ _Let's say this is an offside post. It doesn't concern any serial articles about
 
 ![A human who is thinking](https://i.pinimg.com/564x/31/01/b1/3101b17c829563c2cedfaf19bd78ea77.jpg)
 
-THis article is also available on my [Hashnode](https://tawalmcblog.hashnode.dev/) account.
+This article is also available on my [Hashnode](https://tawalmcblog.hashnode.dev/) account.
 
 # So we need to write the firmware for our next embedded project
 

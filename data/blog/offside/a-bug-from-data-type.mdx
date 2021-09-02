@@ -1,0 +1,118 @@
+---
+title: '[Offside] - A matter of data type and millis'
+date: '2021-09-01'
+tags: ['offside', 'iot', 'cpp', 'arduino']
+draft: false
+summary: "In embedded world you must take care of data type if you don't want to shoot on your leg."
+images: ['/static/images/data-type-matter.png']
+---
+
+![When I think about data type in my codes](/static/images/data-type-matter.png)
+
+_When I think about data type in my codes - TawalMc with [Excalidraw](https://excalidraw.com/)_
+
+# So we have int, long, char,... as words? no, as data types
+
+Okeuh. And after? Simple we use data types to declare our variables. Something like this:
+
+```c
+int position = 10;
+float average = 15.3;
+```
+
+And each data type can hold (a maximum) `amount of data` (🤪). Each of them has a number of `bytes` that
+can be used to store them depending on the target architecture. And when we are in the embedded we must
+take care of them. We don't work on computer with GigaBytes as storage, and so the greater are our data
+the more bytes we consume and so more spaces. In addition, they are some side effects when we don't use right
+data types and one of them is: `data type overflow`.
+
+## Overflow? Like a water over-flow a container
+
+You know when water overflows a container, it simply `sinks`, but the container is just filled to it. No more.
+It's let's say the samething which we'll happen if your data is bigger than your data types: it `cut-off`.
+So you try to store in `int` a value of `123456` on `Arduino`, not good.
+
+Recently I worked on project and face this issue and only my computer knows how much time I take to figure it out.
+
+## My Problem: store/get millis value
+
+You know with Arduino, `millis()` return the number of `milliseconds` since our `program is running`...
+And the best type to store the `value returned` by `millis()` is `unsigned long`. Why?
+Because, `millis()` can return data like `120'000` which equals to `2 (minutes)`. So imagine you try to store
+this value in `unsigned int`... - _[☠️ Sacrilege - 💀 offense]_
+
+Why again? Look at this [table that I get from sparkfun website.](https://learn.sparkfun.com/tutorials/data-types-in-arduino/defining-data-types)
+
+| Types         | range of values                 | bytes |
+| ------------- | ------------------------------- | ----- |
+| bool          | 1 (true/false)                  | 1     |
+| byte          | 0 to 255                        | 1     |
+| char          | -128 to 127                     | 1     |
+| int           | -32'768 to 32'767               | 2     |
+| unsigned int  | 0 to 65'535                     | 2     |
+| long          | -2'147'483'648 to 2'147'483'647 | 4     |
+| unsigned long | 0 to 4'294'967'295              | 4     |
+| float         | -3.4028235E38 to -3.4028235E38  | 4     |
+
+_`tips: to calculate the max value that a data type can hold`_
+
+```c
+signed types:
+              min = - (2^(bits))/2
+              max =   (2^(bits))/2 - 1
+so int  ->    min = - (2^(16))/2     = - 32768
+              max =   (2^(16))/2 - 1 = 32767
+
+unsigned types:
+                    min = 0
+                    max = 2^(16) - 1
+so unsigned int ->  max = 2^(16) -1  = 65'535
+```
+
+so `max(unsigned long)` > `max(unsigned int)` and what I have done it is something like
+
+```c
+#define MAX_TIME 120000; // 2 minutes I mean
+unsigned int duration_between_req = 0;
+
+void setup() {
+  // do stuff
+  duration_between_req = millis();
+}
+
+void loop() {
+  // do stuff
+
+  if (millis() - duration_between_req >= MAX_TIME) {
+    // execute an action
+
+    duration_between_req = millis();
+  }
+}
+```
+
+### Guess what happens
+
+This piece of code execute correctly one time only. Why ? Simple:
+
+1- After 02 minutes the expression `(millis() - duration_between_req >= MAX_TIME)` is true so
+my code execute first time the action and then put in `duration_between_req` the value returned by `millis()`
+let's say `121'000` so (2minutes+1seconde).
+
+2- But `unsigned int` cannot hold too much and it cut-off. Welcome to bug hunting!! So after just some seconds
+, the expression `(millis() - duration_between_req >= MAX_TIME)` is always true because `duration_between_req`
+don't hold all `value returned by millis` but just truncate it to be less than its maximal value `65'535`. And
+each second (less than 01 second) the program execute this if statement body...
+
+# Yes, it is so fun
+
+I spent at least 30 minutes to understand my code (**my code hum, a code that I write myself**) and let's say, Arduino IDE don't help anymore...
+
+And it is not the end, take care of `byte` yeah the word named `byte` because if by any kind of rain you
+store in Arduino `EEPROM` a data of type `int` and you try to retrieve it as a `long` and **vice versa**,
+**what will happen? What do you hope? What magic will occur? Ask your code...**
+
+I share some tips that I used in my daily tasks and I hope you've some others tips that you want to share
+with us. I'm open to advises, and my social accounts (below) are there for this purposes...
+
+_So can you smell what TawalMc is cooking?_
