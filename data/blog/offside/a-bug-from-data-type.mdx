@@ -29,7 +29,7 @@ data types and one of them is: `data type overflow`.
 ## Overflow? Like a water over-flow a container
 
 You know when water overflows a container, it simply `sinks`, but the container is just filled to it. No more.
-It's let's say the samething which we'll happen if your data is bigger than your data types: it `cut-off`.
+It's let's say the same thing which we'll happen if your data is bigger than your data types: it `cut-off`.
 So you try to store in `int` a value of `123456` on `Arduino`, not good.
 
 Recently I worked on project and face this issue and only my computer knows how much time I take to figure it out.
@@ -102,7 +102,7 @@ let's say `121'000` so (2minutes+1seconde).
 2- But `unsigned int` cannot hold too much and it cut-off. Welcome to bug hunting!! So after just some seconds
 , the expression `(millis() - duration_between_req >= MAX_TIME)` is always true because `duration_between_req`
 don't hold all `value returned by millis` but just truncate it to be less than its maximal value `65'535`. And
-each second (less than 01 second) the program execute this if statement body...
+each second (less than 01 second) the program execute the if statement body...
 
 # Yes, it is so fun
 
