@@ -29,17 +29,17 @@ data types and one of them is: `data type overflow`.
 ## Overflow? Like a water over-flow a container
 
 You know when water overflows a container, it simply `sinks`, but the container is just filled to it. No more.
-It's let's say the same thing which we'll happen if your data is bigger than your data types: it `cut-off`.
+It's let's say the same thing which will happen if your data is bigger than your data types: it `cut-off`.
 So you try to store in `int` a value of `123456` on `Arduino`, not good.
 
-Recently I worked on project and face this issue and only my computer knows how much time I take to figure it out.
+Recently I worked on project and faced this issue and only my computer knows how much time I take to figure it out.
 
 ## My Problem: store/get millis value
 
 You know with Arduino, `millis()` return the number of `milliseconds` since our `program is running`...
 And the best type to store the `value returned` by `millis()` is `unsigned long`. Why?
-Because, `millis()` can return data like `120'000` which equals to `2 (minutes)`. So imagine you try to store
-this value in `unsigned int`... - _[☠️ Sacrilege - 💀 offense]_
+Because, `millis()` can return a value like `120'000` which equals to `2 (minutes)`. So imagine you try to store
+this value in `unsigned int`... - _[☠️ Sacrilege - 💀 Offense]_
 
 Why again? Look at this [table that I get from sparkfun website.](https://learn.sparkfun.com/tutorials/data-types-in-arduino/defining-data-types)
 
