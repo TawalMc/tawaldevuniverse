@@ -1,0 +1,190 @@
+---
+title: '[web] - Pourquoi Next.js plutôt que create-react-app'
+date: '2022-01-27'
+tags: ['web', 'javascript', 'react', 'next']
+draft: false
+summary: 'Pourquoi se fatiguer à faire un lot de configurations si on peut juste commencer par travailler sans se gêner?'
+images: ['/static/images/next_vs_react.webp']
+---
+
+_This article is available in english on my [account](https://dev.to/tawalmc/why-nextjs-rather-than-create-react-app--22ed) on Dev.to_
+
+![Next.js vs React.js logo](/static/images/next-vs-react.webp)
+
+_Image from [Morioh](https://morioh.com/p/c8b86f70b8fe)_
+
+_Pourquoi se fatiguer à faire un lot de configurations si on peut juste commencer par travailler sans se gêner?_
+_Bien, je vous explique ici (avec de l'humour) pourquoi je recommande de débuter un nouveau projet avec Next.js au lieu d'utiliser create-react-app._
+
+## Rappel sur React.js (create-react-app) et Next.js
+
+### React.js, le soldat de l'armée des devs
+
+Alors [React.js](https://reactjs.org/) est un framework (frontend) basé sur JavaScript et développé par nos amis développeurs de Meta
+(vous savez, l'entreprise qui veut dépasser le monde physique) en 2013 (j'étais en classe de $3^è$).
+Donc il te permet en gros :
+
+- d'avoir des composants réutilisables avec des caractéristiques (propriétés)
+- d'embarqué du JavaScript dans du HTML avec un certain charisme
+- de permettre aux composants d'avoir des cycles de vie, un état que le dev peut influencer
+
+Un code en React ressemble à ceci :
+
+```jsx
+import { useEffect, useState } from 'react'
+
+export const NavBar = (props) => {
+  const [news, setNew] = useState(false)
+
+  useEffect(() => {
+    console.log('We are in NavBar')
+  }, [])
+
+  return (
+    <nav>
+      <ul>
+        <li>Home</li>
+        <li>About</li>
+        <li>{props.serviceName}</li>
+        <li>{props.locationName}</li>
+        {news && <li>News</li>}
+      </ul>
+    </nav>
+  )
+}
+```
+
+Mais là n'est pas le but de cet article, parlons de create-react-app. Oui [Create React App](https://create-react-app.dev/),
+l'outil mis en place par l'équipe derrière React pour débuter un projet en react. Déjà il est très bon, tout
+développeur React l'a utilisé au moins une fois genre:
+
+```jsx
+npm install react-scripts@latest
+```
+
+Donc avec cette commande tu as ton projet React qui est initialisé et pata-boom; un dossier minimaliste, où tu dois
+littéralement tout configurément: du routage à eslint (ma bête noire) en passant par la création des dossiers phares.
+Un coup d'oeil à l'article de [Hudson Kunde sur Morioh](https://morioh.com/p/c8b86f70b8fe) qui parle de la structure des fichiers...
+Fatigant et ennuyant parfois. Et même avec la version récente pour avoir du Server Side Rendering c'est du boulot, bref nous sommes
+avec du Client Side Rendering (`le rendu de la page basé sur le bundle de JavaScript se fait par le navigateur`).
+Genre tu as un tout mignon paquet de JavaScript qui est balancé aux navigateurs en lui disant: `Hey frangin, débrouille toi de me faire ce rendu de JS.`
+
+Et là les devs de Vercel rentrent dans le game.
+
+### Next.js, le bouclier de React
+
+Bon le titre est un peu forcé mais honnêtement c'est comme ça je considère Next.js.
+
+Déjà [Next.js](https://nextjs.org/) est développé par Vercel en 2016 (là je passe mon Bac). Vercel ?
+Bah vous savez je me dis que, quand les devs de se level sont parfois ennuyés ou se lèvent tout joyeux ils se disent :
+`et si on développait un projet histoire de passer le temps ?`. Bah c'est exactement ce qui s'est passé. Ils développent
+Next.js avec comme buts:
+
+- tout se fait en JavaScript et partout (comme s'ils avaient pensé à moi)
+- toutes les configurations/fonctionnalités standards dont le le SSR (Server Side Rendering) seront defacto incluses (je vous dis qu'ils ont pensé à moi)
+- facilter le déployement d'une application web (et oui la plateforme Vercel est là pour ça)
+- etc
+
+Voir cet article de [Wikipedia](https://en.wikipedia.org/wiki/Next.js) sur les 6 principes derrières Next.js.
+
+En gros, Next.js est basé sur React.js donc vous aurez à utiliser les fonctionnalités de React (state, lifecycle, props,...)
+mais ce sont les mmultiples fonctionnalités de Next.js qui font de lui un de mes frameworks préférés.
+Dans la suite je vous présente juste 3 de ces fonctionnalités que j'utilise actuellement et qui sont pour moi les meilleures
+(expérience).
+
+## Pourquoi alors Next.js et non create-react-app
+
+Déjà pour débuter un projet Next.js on peut simplement :
+
+```jsx
+npx create-next-app //et vous suivez les instructions
+```
+
+Alors les 3 fonctionnalités dont je parle :
+
+### Routes basées sur les fichiers (pages) js/jsx
+
+Là c'est du lourd: les routes de votre application sont basées sur les fichiers `js/jsx` que vous crééz dans le dossier
+`pages`. Donc si on a:
+
+```jsx
+pages - index.js - about.js - contact.js
+```
+
+vous avez alors les pages:
+
+```jsx
+`index.js` -> `/`
+`about.js` -> `/about.html`
+`contact.js` -> `/contact.html`
+```
+
+Reconnaissez la classe!!! Et oui cela nous épargne les: `react-router`, `react-router-browser`, `react-router-browser-router`, etc (j'exagère)
+qu'il fallait pour gérer les pages avec create-react-app. Ouff!!
+
+Et ils sont allés loin (franchement ils ne dorment pas) en mettant à disposition le dossier `api`
+à l'intérieur du dossier `pages` où vous pouvez définir les routes de votre api (REST par exemple) si
+vous voulez mettre à disposition des données/API à des devs ou à d'autres équipes. Donc plus besoin d'aller
+créer un autre projet en Node.js et créer une API à part entière.
+
+### Import global dans le projet
+
+Alors là sérieusement, j'ai apprécié. Vous vous rappelez quand on crée des fichiers (components) dans des sous-dossiers
+et que lors des imports nous faisons face à des chemins très longs de laideur et d'erreurs:
+
+```jsx
+import NavBar from '../../components/somewhere'
+```
+
+Bah dites vous que Next.js corrige ça avec les imports globaux.
+Donc vous pouvez depuis n'importe quel fichier (quelque soit l'endroit/dossier) avoir ceci finalement :
+
+```jsx
+import NavBar from '@/components/somewhere'
+```
+
+Super chic, élégant et méritant l'oscar de la `solution intuitive`. Et pour y arriver rien de plus simple:
+
+- Vous créez un fichier soit jsconfig.json soir tsconfig.json (en fonction de votre projet)
+- Vous indiquez les chemins/dossiers qui seront pris en compte comme import global (exemple suivant)
+
+```jsx
+// jsconfig.json or tsconfig.json
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["components/*"],
+      "@/data/*": ["data/*"],
+      "@/layouts/*": ["layouts/*"],
+      "@/lib/*": ["lib/*"],
+      "@/css/*": ["css/*"]
+    }
+  }
+}
+```
+
+Et le tour est joué!
+
+Alors je m'en arrête là. Oui parceque en termes d'innovations, Next.js vient avec un lot de
+features. Je n'ai pas abordé l'optimisation des images, de SWC (Speed Web Compiler) qui est 20 fois
+plus rapide que Babel dans la compilation des fichiers JS/TS, les questions de rendu (SSG, SSR, ISR),
+l'utilisation de Next.js avec Capacitor pour les applications hybrides, etc. Vous pouvez vos rendre sur
+le [site de Next.js](https://nextjs.org/) pour avoir plus d'informations.
+
+## Enfin ?
+
+Ce n'est pas pour balayé du revers de la main create-react-app qui reste super comme outils mais si vous
+êtes comme moi et parfois vous aimez vite débuter les projets sans pour autant vous souciez des questions de
+config ou de setup alors Next.js est pour vous. Et aussi c'est un framework `progressiste`
+(rien avoir avec la politique) donc des améliorations et ajouts sont très fréquents.
+
+Au passage j'ai déployé sur Vercel une appli orientée mobile basée sur Next.js, Chakra UI (UI Components) et
+Lingui.js pour la traduction du site (internationalisation) et qui est [disponible ici](https://rsourah.vercel.app/).
+
+Je vous propose prochainement d'aller à la découverte de ces 4 (frameworks) mousquetaires basés sur `React` à savoir...
+
+Je partage quelques astuces que j'utilise dans mes tâches quotidiennes et j'espère que vous en avez d'autres que
+vous voulez partager avec nous. Je suis ouvert aux conseils, et mes comptes sociaux (ci-dessous) sont là pour ça.
+
+_So can you smell what TawalMc is cooking?_
