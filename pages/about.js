@@ -22,11 +22,9 @@ export default function About() {
             <h3 className="pt-4 pb-2 text-2xl font-bold leading-8 tracking-tight">
               {siteMetadata.author}
             </h3>
+            <div className="text-gray-500 dark:text-gray-400">Power and Process Engineer.</div>
             <div className="text-gray-500 dark:text-gray-400">
-              Power and Process Engineer [Embedded Systems/IoT].
-            </div>
-            <div className="text-gray-500 dark:text-gray-400">
-              Passionate about IoT, computer programming and the world of software dev.
+              Passionate about IoT, Game dev, computer programming and the world of software dev.
             </div>
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} />
@@ -60,14 +58,10 @@ export default function About() {
             </p>
             <p>
               I am a fan of the C ++ language that I use in embedded systems (programming
-              microcontrollers, IoT, ...) and whose uses I explore. I am currently appropriating
-              Kotlin to be able to develop robust and reliable IoT (Android) mobiles applications. I
-              like and use JavaScript a lot. Because it allows me to be fullstack but also to be
+              microcontrollers, IoT, ...). Because it allows me to be fullstack but also to be
               independent and quickly realize my ideas for cross-platform web and mobile
-              applications through React (my favorite JS framework), ReactNative and the eternal
-              NodeJS (it's so cool this runtime) that I use for setting up web server. So I can
-              think of a complete IoT architecture: from the hardware to the web platform via the
-              mobile application.
+              applications through React (my favorite JS framework), React Native and the eternal
+              NodeJS (it's so cool this runtime) that I use for setting up web server.
             </p>
           </div>
         </div>

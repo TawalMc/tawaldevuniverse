@@ -1,3 +1,4 @@
+import Comments from '@/components/Comments'
 import Link from '@/components/Link'
 import PageTitle from '@/components/PageTitle'
 import SectionContainer from '@/components/SectionContainer'
@@ -83,6 +84,7 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
                 {` • `}
                 <Link href={postLinkedIn(title, slug)}>{'LinkedIn'}</Link>
               </div>
+              <Comments frontMatter={frontMatter} />
             </div>
             <footer>
               <div className="text-sm font-medium leading-5 divide-gray-200 xl:divide-y dark:divide-gray-700 xl:col-start-1 xl:row-start-2">
