@@ -151,20 +151,3 @@ The easiest way to deploy the template is to use the [Vercel Platform](https://v
 
 **Netlify / Github Pages / Firebase etc.**  
 As the template uses `next/image` for image optimization, additional configurations has to be made to deploy on other popular static hosting websites like [Netlify](https://www.netlify.com/) or [Github Pages](https://pages.github.com/). An alternative image optimization provider such as Imgix, Cloudinary or Akamai has to be used. Alternatively, replace the `next/image` component with a standard `<img>` tag. See [`next/image` documentation](https://nextjs.org/docs/basic-features/image-optimization) for more details.
-
-<!--
-<script src="https://giscus.app/client.js"
-        data-repo="TawalMc/tawaldevuniverse"
-        data-repo-id="MDEwOlJlcG9zaXRvcnkzNzg2MDYxNDM="
-        data-category="Announcements"
-        data-category-id="DIC_kwDOFpESP84CA8Sv"
-        data-mapping="pathname"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="light"
-        data-lang="en"
-        crossorigin="anonymous"
-        async>
-</script>
- -->

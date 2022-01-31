@@ -1,10 +1,11 @@
-import Comments from '@/components/Comments'
+/* import Comments from '@/components/Comments' */
 import Link from '@/components/Link'
 import PageTitle from '@/components/PageTitle'
 import SectionContainer from '@/components/SectionContainer'
 import { BlogSeo } from '@/components/SEO'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
+import { Giscus } from '@giscus/react'
 
 const editUrl = (fileName) => `${siteMetadata.siteRepo}/blob/master/data/blog/${fileName}`
 const discussUrl = (title, slug) =>
@@ -84,7 +85,17 @@ export default function PostLayout({ children, frontMatter, next, prev }) {
                 {` • `}
                 <Link href={postLinkedIn(title, slug)}>{'LinkedIn'}</Link>
               </div>
-              <Comments frontMatter={frontMatter} />
+              {/* <Comments frontMatter={frontMatter} /> */}
+              <Giscus
+                repo={`${process.env.NEXT_PUBLIC_GISCUS_REPO}`}
+                repoId={`${process.env.NEXT_PUBLIC_GISCUS_REPOSITORY_ID}`}
+                category={`${process.env.NEXT_PUBLIC_GISCUS_CATEGORY}`}
+                categoryId={`${process.env.NEXT_PUBLIC_GISCUS_CATEGORY_ID}`}
+                mapping="pathname"
+                reactionsEnabled="1"
+                emitMetadata="0"
+                theme="light"
+              />
             </div>
             <footer>
               <div className="text-sm font-medium leading-5 divide-gray-200 xl:divide-y dark:divide-gray-700 xl:col-start-1 xl:row-start-2">
