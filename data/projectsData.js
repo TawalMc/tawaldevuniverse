@@ -14,7 +14,7 @@ const projectsData = [
   {
     title: 'TinyDatabase - TinyDatabase_Arduino (C++ - Arduino)',
     description: `TinyDatabase is a library that allow the management of persistent internal memory (EEPROM) of microncontroller. With a syntax near to the SQL queries, it encapsulates the writing/reading of EEPROM data which was done with their address by providing a more friendly and simply API.`,
-    imgSrc: '/static/TinyDatabase-logo.png',
+    imgSrc: '/static/images/TinyDatabase-logo.png',
     href: 'https://tinydatabase-doc.vercel.app/',
   },
   {
