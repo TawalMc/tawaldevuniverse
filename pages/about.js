@@ -24,7 +24,8 @@ export default function About() {
             </h3>
             <div className="text-gray-500 dark:text-gray-400">Power and Process Engineer.</div>
             <div className="text-gray-500 dark:text-gray-400">
-              Passionate about IoT, Game dev, computer programming and the world of software dev.
+              Passionate about web dev, Game dev, computer programming and the world of software
+              dev.
             </div>
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} />
@@ -38,9 +39,8 @@ export default function About() {
           <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">
             <p>
               My name is Tawaliou ALAO and I am a young engineer in energy and process engineering
-              focused on embedded systems and IoT. I am currently an intern at YoupiLab and I live
-              in Benin. I love computer programming and I explore the world of software development
-              to discover ... maybe aliens
+              from Benin focused on web devlopment. I love computer programming and I explore the
+              world of software development to discover ... maybe aliens
               <span role="img" aria-label="smile">
                 🤣
               </span>
@@ -58,10 +58,10 @@ export default function About() {
             </p>
             <p>
               I am a fan of the C ++ language that I use in embedded systems (programming
-              microcontrollers, IoT, ...). Because it allows me to be fullstack but also to be
-              independent and quickly realize my ideas for cross-platform web and mobile
-              applications through React (my favorite JS framework), React Native and the eternal
-              NodeJS (it's so cool this runtime) that I use for setting up web server.
+              microcontrollers, IoT, ...)and JavaScript because it allows me to be fullstack but
+              also to be independent and quickly realize my ideas for cross-platform web and mobile
+              applications through React.js/Next.js (my favorite JS framework), React Native and the
+              eternal NodeJS (it's so cool this runtime) that I use for setting up web server.
             </p>
           </div>
         </div>
