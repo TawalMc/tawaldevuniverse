@@ -1,0 +1,122 @@
+---
+title: '[web] - Install the same package versions as a tutorial'
+date: '2022-05-24'
+tags: ['web', 'javascript', 'react']
+draft: false
+summary: 'I advise you when following a tutorial to always install exactly the same package versions as used in the tutorial.'
+images: []
+---
+
+_very short article_
+
+## Version problems
+
+When you follow a tutorial (JS/React/...) take care to install exactly the same package versions as those installed in the tutorial
+you are following. Here is the reason.
+
+A package that the author of the video or the tutorial has used may be updated by his `maintainers` at the time you follow the tutorial.
+And maybe there are changes in this update that break the compatibility with existing code or change the return of the functions used
+in the tutorial. So you will run the same commands or code without success on your side. Either you will get errors or warnings that you
+have trouble understanding at first. In the best case, the author will update his tutorial or if you are using `TypeScript` some
+behaviors like executing a non-existent function or using a property that is not present in an object will rise an error.
+
+I give two examples that happened to me.
+
+### 1st example
+
+The tutorial exists in two versions: video and written. Here the author has handled the problem well.  
+In one of the sections of the written version (which is up to date) he added the remark that a second line of code is needed if the verion of a specific package
+package used is `x`. While in the video there was no such precision. I had started with the video and soon I had a problem with the execution and quickly encountered a problem at runtime and had to turn to the written version to understand the problem.
+
+### 2nd example: children
+
+For those who are familiar with react, you will recognize the `children` prop of react which allows you to have one or more `React Element` as "child(ren)" of another
+react component, a bit like here:
+
+```JS
+
+// Before React 18
+
+// main.tsx
+type MainProps = {
+	name?: string
+}
+
+const Main: React.FC<MainProps> = ({ name = "", children }) => {
+	return (
+		<>
+			<h1>{name}</h1>
+			<div className="mt-10">{children}</div>
+		</>
+	);
+}
+
+// sub.tsx
+const Sub = () => {
+	return (
+		<Main>
+			<h1> Bankai </h1>
+			<p> Senbon Zakura </p>
+		</Main>
+	);
+}
+```
+
+Long before there was no need to specify children in the props, because children was added by default to the `react components` much like the `key`
+prop and the react typing (`@types/react`) was set up that way. But with version 18, you have to specify children in the props. So
+
+```ts
+// After React 18
+
+// main.tsx
+type MainProps = {
+  name?: string
+  children: ReactNode // MUST
+}
+
+const Main: React.FC<MainProps> = ({ name = '', children }) => {
+  return (
+    <>
+      <h1>{name}</h1>
+      <div className="mt-10">{children}</div>
+    </>
+  )
+}
+
+// sub.tsx
+const Sub = () => {
+  return (
+    <Main>
+      <h1> Bankai </h1>
+      <p> Senbon Zakura </p>
+    </Main>
+  )
+}
+```
+
+Now, imagine that you are following a tutorial from 2021 in 2022 where `children` was used as an implicit prop without being aware of
+of this change?
+
+**Anecdote**: I usually type `children` every time I use TS + React or TS + Next.js so when I configure new projects
+I had not encountered this problem, it was once on Twitter, I noticed that there were tweets in all directions on the subject. But more
+fear than harm.
+
+## Bonus: How to install a package version
+
+Just open the package json of the (tutorial) project then copy `dependencies` and `devDependencies` sections and paste them in your project.
+And run after `yarn` or `npm install`. If you want to install a specific version of a package try:
+
+```js
+yarn add package-name@version
+```
+
+or
+
+```js
+npm install package-name@version
+```
+
+I'm sharing a few tips I use in my daily tasks and I hope you have others that you want to share with us.
+you want to share with us. I'm open to tips, and my social accounts (below) are there for that.
+
+_So can you smell what TawalMc is cooking?_
