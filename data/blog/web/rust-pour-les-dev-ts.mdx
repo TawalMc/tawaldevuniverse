@@ -1,0 +1,179 @@
+---
+title: '[system] - Rust pour les devs TypeScript: Part 1'
+date: '2022-06-10'
+tags: ['web', 'system', 'typescript', 'rust']
+draft: false
+summary: 'Découvrons Rust du point de vue dev TypeScript.'
+images: ['/static/images/rust-ts.png']
+version: 'fr'
+---
+
+![rust-lang logo](/static/images/rust-ts.png)
+
+Découvrons Rust du point de vue dev TypeScript.
+
+## C'est quoi Rust ?
+
+Rust est un langage de programmation orienté système. C'est un langage à typage static (fort) un peu comme
+le C++. Il a été créé à la Mozilla Research avec pour objectifs entre autres :
+
+- de régler efficacement les problèmes de gestion de mémoire rencontrés avec le C/C++ par exemple;
+  où les questions de `memory overflow` (débordement de mémoire allouée) ou `dangling reference`
+  (référence sur un objet qui n'existe plus) sont monnaies courantes et ceci en aidant le développeur
+
+- d'améliorer les performances dans l'exécution de code (Rust est connu pour sa rapidité incroyable)
+
+-...
+
+En gros des caractéristiques similaires au C/C++ mais avec plus de `sécurité`, `performance(similaires)`, des
+supports pour les systèmes embarqués, le websasembly.
+
+Je viens de citer des points qui m'interessent particulièrement. Vous pouvez vous rendre sur
+
+- le site de [rust-lang](https://www.rust-lang.org/) pour en savoir un peu plus sur le langage
+
+- la page des entreprises qui utilisent déjà Rust en production [ici](https://www.rust-lang.org/production/users)
+  pour avoir une idée du comment et du pourquoi de l'utilisation par ces dernières.
+
+Revenons à notre sujet: "Rust pour les devs TS"
+
+## Rust et TypeScript
+
+Je trouve des ressemblances entre Rust et TypeScript (JavaScript avec du typage statique).
+
+### Gestionnaire de packages
+
+Il dispose de [crates.io](https://crates.io/), le dépôt officiel des packages Rust un peu comme [npmjs.com](https://www.npmjs.com/).
+
+A l'instar de `npm` disponible dans l'environnement `node`, Rust dispose aussi d'un gestionnaire de packages: `cargo`.
+
+Ainsi on peut:
+
+- Initialiser un projet
+
+```rust
+cargo new project_name // Pour créer un nouveau projet et l'initialiser
+```
+
+- Build un projet
+
+```rust
+cd project_name // Se rendre dans le répertoire du projet
+cargo build 		// Compiler le projet, si c'est un dépot GitHub il installe les dépendances et compile
+```
+
+- Exécuter un projet
+
+```rust
+cd project_name // Se rendre dans le répertoire du projet
+cargo run 		// Exécuter le projet
+```
+
+Cargo vient avec beaucoup plus d'options.
+
+`NB`:
+
+- Cargo pour de simples projets, n'est pas trop `utile` parce qu'à la configruation de Rust sur votre machine, vous
+  avez le compilateur `rustc` qui permet de build et run un projet. Dison que `rustc` c'est le `gcc/g++` en C/C++ et
+  cargo le `cmake` (j'ai pas trouvé une meilleure analogie).
+
+- On parle de `crate` pour désigner un programme qui peut être une bibliothèque ou un exécutable d'où les crates sont hébergés sur crates.io
+
+- `Package` désigne un ensemble de crates avec des fonctionnalités pour build et run ces derniers.
+
+### Types des données en Rust
+
+Rust supporte les types primitifs suivants
+
+- les entiers: `i8` (8-bit ou prend 8 bits d'espace mémoire), `i16`(16-bit), `i32`, `i64`, `i128`, `isize` et leurs versions non-signées (`u8`, `u16`, ...)
+
+- les nombres décimaux (qui sont signés): `f32`, `f64`
+
+_En TS ces deux catégories sont représentées par le type `number`._
+
+- les caractères: `char`, un peu comme: '😎', 's', 'A'
+
+Ensuite nous avons les collections
+
+- `tuple` qui représente une collection d'un nombre connu données de différents types: `(i32, f64, u25)` apr exemple
+
+- les tableaux ou array qui sont de tailles fixex contrairement à ce qu'on peut voir en TS.
+
+Il ya aussi les types un peu plus avancés comme `String`, les slices (nous reviendrons dans de futurs articles la-dessus).
+Et enfin nous avons quelques structures de données comme les vecteurs `Vect<T>`, les map `HashMap`...
+
+### Variables en Rust
+
+Pour créer une variable dans Rust
+
+```rust
+fun main() {
+	let age: i8 = 15;
+	let emoji = '😒';
+}
+```
+
+`NB`: Tout comme en C++, en Rust il faut une fonction d'entrée pour un exécutable, ici **fun main(){ }**.
+
+Et oui. Pour créer une variable en Rust, on utilise aussi le mot clé `let` un peu comme en JS.
+
+Je vais crier fort pour évoquer une particularité des variables en Rust: **LES VARIABLES DANS RUST A LA CREATION SONT IMMUTABLES**.
+En d'autres une opération comme celle ci:
+
+```rust
+fun main() {
+	let age = 15; // le compilateur de Rust fera une inférence (déduction) de type ici
+	age = 25; // Une erreur pure et simplement
+}
+```
+
+ne marchera pas. Pour pouvoir modifier une variable il faut la créer en tant que `mutable`, d'où la notion de
+`mutability` qui revient souvent quand on lit un doc Rust. Ainsi il faudra faire:
+
+```rust
+let mut age = 15; // ceci la valeur de la variable age éditable
+age = 25;
+```
+
+En fait cette notion de `mutability` ouvre la porte à trois concepts phares, clés, primordiaux, importants, nécessaires,
+(et puis quoi encore) en Rust. Ils se rejoignent et sont inséparables:
+
+- `Ownership`: la propriété, le droit d'accès
+
+- `Référence`: une sorte `pointeur`/variable qui représente l'adresse de la donnée stockée
+
+- `Borrowing`: l'emprunt/le passage d'une référence.
+
+Je disais plus haut que Rust est memory-safety c'est à dire qu'en terme de gestion de mémoires, il garantit la sécurité dans la manipulation de la mémoire.
+Bien c'est en fait à cause de ces trois concepts qui sont définis avec des règles bien précises. (Dans nos futures articles nous allons abordés)
+ces notions en profondeur).
+
+### Terminons avec les fonctions en Rust
+
+```rust
+fun nom_de_la_fonction() {
+	// corps
+}
+
+fun une_autre_fonction(age: u8, annee_courante: u64) -> u64 {
+	return annee_courante - age;
+}
+
+// ou simplement
+fun une_autre_fonction(age: u8, annee_courante: u64) -> u64 {
+	annee_courante - age // retournera le résultat du calcul
+}
+```
+
+Une particularité avec les fonctions de Rust, il n'y a pas de valeur par défaut.
+
+### En gros
+
+Nous avons juste abordé quelques concpets de base de Rust qui ressemblent un peu à du TypeScript,
+prochainement nous en aborderons d'autres .
+
+_Aussi, il y a un truc que j'ai remarqué avec Rust et que je ne comprends pas encore: chaque concept, notion, fonctionnalité a une particularité **bizarre**. Bah oui, tu crée une **variable** mais à la base elle est **immutable**, une variable je te dis._
+
+I'm sharing a few tips I use in my daily tasks and I hope you have others that you want to share with us. I'm open to tips, and my social accounts (below) are there for that.
+
+_So can you smell what TawalMc is cooking?_
