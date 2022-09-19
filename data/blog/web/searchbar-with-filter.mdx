@@ -1,0 +1,144 @@
+---
+title: '[web] - Une Barre de recherche avec un filtre en React - Partie 1: MUI'
+date: '2022-09-17'
+tags: ['web', 'typescript', 'react']
+draft: false
+summary: 'Nous allons créer en React une barre de recherche(avancée) avec filtre.'
+images: []
+---
+
+Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
+des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
+
+Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox)
+
+## Le contexte
+
+Dans une de mes tâches dans la boîte où je travaille, il y a un formulaire dans lequel
+un administrateur devrait attribuer des fonctionnalités à des utilisateurs. Donc il peut
+sélectionner des utilisateurs, soit taper le nom et sélectionner certains ou juste grouper
+les utilisateurs par leur rôle. Donc en gros une barre de recherche avec un filtre et quelques
+autres fonctionnalités. Donc j'ai fait une première implémentation en utilisant Material UI
+que je vais décrire ici.
+
+## Le problème
+
+1. `Grouper` les utilisateurs sur la base d'une `caractéristique quelconque`
+2. `Sélectionner` certains utilisateurs
+3. `Filtrer` la liste d'utilisateurs en se basant sur les différents groupes
+4. `Exposer` la liste d'utilisateurs choisis
+
+Un peu comme sur la vidéo suivante
+
+<div
+  style={{
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}
+>
+  <video width="500" height="340" loop controls autoPlay muted>
+    <source
+      aria-label={'Barre de recherche avec filtre'}
+      about={''}
+      src={'/static/images/barre_de_recherche_avec_filtre.mp4'}
+      type="video/mp4"
+    />
+    Votre navigateur ne prend pas en charge audio ou video.
+  </video>
+</div>
+
+## La solution
+
+#### 1ère étape : configuration du projet
+
+En supposant que node est installé sur votre machine, nous allons :
+
+- configurer un petit projet react + typescript en utilisant vite
+
+```shell
+yarn create vite
+```
+
+- installer les dépendances de MUI
+
+```shell
+yarn add @mui/material @emotion/react @emotion/styled
+```
+
+```shell
+yarn add @mui/icons-material
+```
+
+Ensuite un dossier `components/SearchbarWithSelectboxAndAutocompletionInMUI`
+et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
+
+- Pour les tests
+  Nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
+  Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
+  **_data.json_** (stocké dans la constante `DummyData`) et **_index.ts_**.
+
+#### 2ᵉ étape : Les deux premiers points
+
+1. `Grouper` les utilisateurs sur la base d'une `caractéristique quelconque`
+2. `Sélectionner` certains utilisateurs
+
+Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react-autocomplete/)
+qui est un input qui permet la recherche dans une liste d'éléments qui peuvent être cochés.
+Donc on aura (faîtes les imports nécessaires) :
+
+`SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
+
+```js
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
+const checkedIcon = <CheckBoxIcon fontSize="small" />
+const SearchbarSelectCheckbox = () => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', width: '500px' }}>
+      <Autocomplete
+        multiple
+        limiTags={1}
+        groupBy={(option) => option.teams.title}
+        options={DummyData}
+        disableCloseOnSelect
+        getOptionLabel={(option) => `${option.firstName} ${option.lastName}`}
+        renderOption={(props, option, { selected }) => (
+          <li {...props}>
+            <Checkbox
+              icon={icon}
+              checkedIcon={checkedIcon}
+              style={{ marginRight: 8 }}
+              checked={selected}
+            />
+            {option.firstName} ${option.lastName}
+          </li>
+        )}
+        style={{ width: 500 }}
+        renderInput={(params) => <TextField {...params} label="Checkboxes" placeholder="People" />}
+      />
+    </div>
+  )
+}
+```
+
+Vous l'aurez remarqué, il y a le checkbox qui est rendu par le component et les deux props qui
+nous intéressent ici sont
+
+- `options` qui prend le tableau de données
+
+- `groupBy` qui prend une fonction (callback) qu'elle applique à chaque élément de la liste pour
+  gérer le groupage
+
+**Bon disons la vérité, jusque-là on a fait que copier la doc de MUI, merci à eux.**
+
+#### 3ᵉ étape : Le component de filtrage
+
+#### Bonus
+
+## So
+
+I'm sharing a few tips I use in my daily tasks and I hope you have others that you want to share with us.
+you want to share with us. I'm open to tips, and my social accounts (below) are there for that.
+
+_So can you smell what TawalMc is cooking?_

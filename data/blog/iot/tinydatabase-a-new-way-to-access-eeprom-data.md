@@ -1,7 +1,7 @@
 ---
 title: '[Library] - TinyDatabase: A new way to access EEPROM data'
 date: '2021-10-18'
-tags: ['library', 'iot', 'cpp', 'arduino']
+tags: ['iot', 'cpp', 'arduino']
 draft: false
 summary: "When working on embedded projects we need sometimes to persist data. We can use so the internal EEPROM of our board and access data through their index. Let's dicover a new library that encapsulate this process."
 images: ['/static/images/tinydatabase-logo.png']
