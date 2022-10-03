@@ -85,12 +85,12 @@ et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
 2. `Sélectionner` certains utilisateurs
 
 Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react-autocomplete/)
-qui est un input qui permet la recherche dans une liste d'éléments qui peuvent être cochés.
+qui est un input permettant la recherche dans une liste d'éléments qui peuvent être cochés.
 Donc on aura (faîtes les imports nécessaires) :
 
 `SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
 
-```js
+```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
 const SearchbarSelectCheckbox = () => {
@@ -144,7 +144,131 @@ nous intéressent ici sont
 
 #### 3ᵉ étape : Le component de filtrage
 
-#### Bonus
+Ici c'est juste un select box à la MUI:
+
+```jsx
+<FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
+  <Select displayEmpty size="small" inputProps={{ 'aria-label': 'Without label' }}>
+    <MenuItem value="">Tout</MenuItem>
+    {['JSBenin', 'PythonBenin', 'RustBenin', 'PHPBenin'].map((entity) => (
+      <MenuItem key={entity} value={entity}>
+        {entity}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+```
+
+Donc un select avec des menus items à l'intérieur lisant les différentes valeurs du select.
+
+<details >
+    <summary>Les deux codes ensemble ici</summary>
+
+`SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
+
+```jsx
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
+const checkedIcon = <CheckBoxIcon fontSize="small" />
+const SearchbarSelectCheckbox = () => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', width: '500px' }}>
+      <FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
+        <Select displayEmpty size="small" inputProps={{ 'aria-label': 'Without label' }}>
+          <MenuItem value="">Tout</MenuItem>
+          {['JSBenin', 'PythonBenin', 'RustBenin', 'PHPBenin'].map((entity) => (
+            <MenuItem key={entity} value={entity}>
+              {entity}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth>
+        <Autocomplete
+          fullWidth
+          multiple
+          disableCloseOnSelect
+          limitTags={1}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              padding: 0,
+              height: 'auto',
+            },
+          }}
+          options={DummyData}
+          groupBy={(option: DummyDataType) => option.teams.title}
+          getOptionLabel={(option: DummyDataType) => `${option.firstName} ${option.lastName}`}
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {option.firstName} {option.lastName}
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField {...params} placeholder={'Populations'} sx={{ paddingY: 0 }} />
+          )}
+        />
+      </FormControl>
+    </div>
+  )
+}
+```
+
+</details>
+
+#### 4ᵉ étape : Le filtrage
+
+Nous allons nous baser sur l'image suivante:
+
+![Searchbar-with-filter-steps](/static/images/searchbarwithfilter.png)
+
+1. **Extraire le tableau pour le dropdown**
+
+L'utilsiateur fournit un tableau de données, on parcours celui-ci et nous récupérons les
+valeurs pour le dropdown en nous basant sur un callback que l'utilisateur renvoie.
+
+```jsx
+type SearchbarSelectCheckboxType<T extends unknown> = {
+    groupBy: (value: T) => string
+    data: T[] | undefined
+}
+
+const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
+   const {data, groupBy} = props;
+
+    let entitiesGroupAsMap = useMemo(() => {
+    let setEntity = new Set(data.map(groupBy));
+    let mapEntity = new Map<string, string>();
+
+    setEntity.forEach((v) => {
+    if (v !== undefined && v !== null) mapEntity.set(v, v);
+
+    });
+    return mapEntity;
+
+    }, [data, groupBy]);
+
+    return (
+        {/** Le reste du code ici **/}
+    )
+}
+
+// example
+<SearchbarSelectCheckbox
+        data={DummyData}
+        groupBy={(value: DummyDataType) => value.teams.title}/>
+```
+
+En gros:
+
+- nous parcourons le tableau de données avec un `map`, et grâce à=au callback (`̀groupBy`)
+  passé en props, nous pouvons récupérer la liste (les valeurs) à fournir au dropdown. Nous le passons
+  à un `Set` pour supprimer les doublons.
+-
 
 ## So
 
