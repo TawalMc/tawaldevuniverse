@@ -240,24 +240,24 @@ type SearchbarSelectCheckboxType<T extends unknown> = {
 const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
    const {data, groupBy} = props;
 
-    let entitiesGroupAsMap = useMemo(() => {
-    let setEntity = new Set(data.map(groupBy));
-    let mapEntity = new Map<string, string>();
+   let itemsGroup = useMemo(() => {
+   let itemsAsSet = new Set(data.map(groupBy));
+   let itemsAsList: string[] = [];
 
-    setEntity.forEach((v) => {
-    if (v !== undefined && v !== null) mapEntity.set(v, v);
-
+    itemsAsSet.forEach((v) => {
+        if (v !== undefined && v !== null) itemsAsList.push(v);
     });
-    return mapEntity;
 
-    }, [data, groupBy]);
+    return itemsAsList;
+
+   }, [data, groupBy]);
 
     return (
-        {/** Le reste du code ici **/}
+            {/** Le reste du code ici **/}
     )
 }
 
-// example
+// example d'utilisation
 <SearchbarSelectCheckbox
         data={DummyData}
         groupBy={(value: DummyDataType) => value.teams.title}/>
@@ -265,10 +265,75 @@ const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
 
 En gros:
 
-- nous parcourons le tableau de données avec un `map`, et grâce à=au callback (`̀groupBy`)
+- `Set` et `groupBy`: nous parcourons le tableau de données avec un `map`, et grâce au callback (`̀groupBy`)
   passé en props, nous pouvons récupérer la liste (les valeurs) à fournir au dropdown. Nous le passons
   à un `Set` pour supprimer les doublons.
--
+- `Array`: comme le dropdown reçoit un tableau d'options, nous convertissons le set en un tableau (javascript array) que
+  nous stockons dans _itemsGroup_.
+- `useMemo`: pour mémoriser cette liste (itemsGroup) et éviter de refaire ces opérations chaque fois qu'il a un rendu du
+  component alors que la liste de
+  donnée n'a pas changé.
+
+2. **Grouper les données utilisées par le autocomplete**
+
+```jsx
+let optionForSearch = useMemo(() => {
+    let optionAsMap = new Map<string, T[]>();
+
+    optionAsMap.set(DEFAULT_SELECT_VALUE, data);
+    itemsGroup.forEach((value) => {
+        optionAsMap.set(
+            value,
+            data.filter((v) => groupBy(v) == value)
+        );
+    });
+
+    return optionAsMap;
+}, [itemsGroup]);
+```
+
+En gros:
+
+- `Map`: pour chaque élément du tableau précédent (**itemsGroup**), nous créons une clé-valeur où la clé
+  est l'élement provenant du tableau, et la valeur est la liste des données (provenant de **data**) filtrées
+  en se basant sur le callback `groupBy`.
+
+3. **Fournir les données au dropdown et à l'autocomplete**
+
+Nous avons déjà le tableau à passer au dropdown, les éléments regroupés qui seront fournis à l'autocomplete, donc
+dans cette étape, nous allons juste définir la liste à afficher en fonction de la catégorie.
+
+Je montre juste les parties du code concernées.
+
+```jsx
+
+{/*...some codes*/}
+
+const [selectedItem, setSelectedItem] = useState(DEFAULT_SELECT_VALUE);
+
+const handleSelectedItemChange = (event: SelectChangeEvent) => {
+      setSelectedItem(event.target.value);
+};
+
+<Select
+    {/*...*/}
+    value={selectedItem}
+    onChange={handleSelectedItemChange}
+  >
+    <MenuItem value={DEFAULT_SELECT_VALUE}>Tout</MenuItem>
+    {
+      itemsGroup.map(entity => <MenuItem key={entity} value={entity}>{entity}</MenuItem>)
+    }
+</Select>
+
+<Autocomplete
+    {/*...*/}
+    options={optionForSearch.get(selectedItem) ?? []}
+    groupBy={groupBy}
+/>
+
+{/*...some codes*/}
+```
 
 ## So
 
