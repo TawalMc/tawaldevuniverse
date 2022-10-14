@@ -322,7 +322,7 @@ const handleSelectedItemChange = (event: SelectChangeEvent) => {
   >
     <MenuItem value={DEFAULT_SELECT_VALUE}>Tout</MenuItem>
     {
-      itemsGroup.map(entity => <MenuItem key={entity} value={entity}>{entity}</MenuItem>)
+      itemsGroup.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)
     }
 </Select>
 
@@ -334,6 +334,20 @@ const handleSelectedItemChange = (event: SelectChangeEvent) => {
 
 {/*...some codes*/}
 ```
+
+Ici rien de nouveau:
+
+- `useState`: on stocke dans un state local l'item choisi dans le dropdown et comme la liste des options
+  rendue par l'autocomplete est gardée dans un Map (avec comme clé les items du dropdown), nous pouvons alors
+  passer la liste d'options qu'il faut à l'autocomplete en nous basant sur la clé
+- `̀groupBy`: autocomplete de MUI utilise la même fonction groupBy (mais est ce que ça vaut la peine).
+- `DEFAULT_SELECT_VALUE`: est juste une valeur par défaut que vous donnez au dropdown
+
+4. **Et maintenant ?**
+   Le code complet (utilisable)
+
+Bref pas grande chose 😊. Nous avons mis ensemble des components déjà créés par MUI et nous pouvons crier un peu
+partout que nous avons créé un custom component (très avancé): `Super!!!`.
 
 ## So
 
