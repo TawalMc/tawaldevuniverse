@@ -6,8 +6,13 @@ import SectionContainer from './SectionContainer'
 import Footer from './Footer'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
+import Dropdown from '@/components/Dropdown'
+import { useState } from 'react'
+import { languages } from '@/lib/constants'
 
 const LayoutWrapper = ({ children }) => {
+  const [selectedLang, setSelectedLang] = useState(languages[0])
+
   return (
     <SectionContainer>
       <div className="flex flex-col justify-between h-screen">
@@ -40,6 +45,7 @@ const LayoutWrapper = ({ children }) => {
                 </Link>
               ))}
             </div>
+            <Dropdown items={languages} value={selectedLang} onChange={setSelectedLang} />
             <ThemeSwitch />
             <MobileNav />
           </div>
