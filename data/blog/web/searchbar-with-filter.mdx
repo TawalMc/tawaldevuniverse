@@ -10,7 +10,7 @@ images: []
 Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
 des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
 
-Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox)
+Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
 
 ## Le contexte
 
@@ -74,8 +74,7 @@ yarn add @mui/icons-material
 Ensuite un dossier `components/SearchbarWithSelectboxAndAutocompletionInMUI`
 et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
 
-- Pour les tests
-  Nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
+- Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
   Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
   **_data.json_** (stocké dans la constante `DummyData`) et **_index.ts_**.
 
@@ -265,18 +264,18 @@ const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
 
 En gros:
 
-- `Set` et `groupBy`: nous parcourons le tableau de données avec un `map`, et grâce au callback (`̀groupBy`)
+- `Set` et `groupBy`: nous parcourons le tableau de données avec un `map`, et grâce au callback (`groupBy`)
   passé en props, nous pouvons récupérer la liste (les valeurs) à fournir au dropdown. Nous le passons
   à un `Set` pour supprimer les doublons.
 - `Array`: comme le dropdown reçoit un tableau d'options, nous convertissons le set en un tableau (javascript array) que
   nous stockons dans _itemsGroup_.
-- `useMemo`: pour mémoriser cette liste (itemsGroup) et éviter de refaire ces opérations chaque fois qu'il a un rendu du
+- `useMemo`: pour mémoriser cette liste (itemsGroup) et éviter de refaire ces opérations chaque fois qu'il y a un rendu du
   component alors que la liste de
   donnée n'a pas changé.
 
 2. **Grouper les données utilisées par le autocomplete**
 
-```jsx
+```js
 let optionForSearch = useMemo(() => {
     let optionAsMap = new Map<string, T[]>();
 
@@ -340,14 +339,95 @@ Ici rien de nouveau:
 - `useState`: on stocke dans un state local l'item choisi dans le dropdown et comme la liste des options
   rendue par l'autocomplete est gardée dans un Map (avec comme clé les items du dropdown), nous pouvons alors
   passer la liste d'options qu'il faut à l'autocomplete en nous basant sur la clé
-- `̀groupBy`: autocomplete de MUI utilise la même fonction groupBy (mais est ce que ça vaut la peine).
+- `groupBy`: autocomplete de MUI utilise la même fonction groupBy (mais est ce que ça vaut la peine).
 - `DEFAULT_SELECT_VALUE`: est juste une valeur par défaut que vous donnez au dropdown
 
 4. **Et maintenant ?**
-   Le code complet (utilisable)
 
-Bref pas grande chose 😊. Nous avons mis ensemble des components déjà créés par MUI et nous pouvons crier un peu
-partout que nous avons créé un custom component (très avancé): `Super!!!`.
+Bref pas grande chose 🤣. Nous avons mis ensemble des components déjà créés par MUI et nous pouvons crier un peu
+partout que nous avons créé un custom component (très avancé): `Super!!!`. Avant de finir, abordons un dernier point:
+le typage de notre nouveau component.
+
+#### 5ᵉ étape : Le typage de la barre de recherche avec filtre
+
+Jetons un coup d'oeil à ce typage où j'intègre des commentaires:
+
+```ts
+import { AutocompleteProps, CheckboxProps, FormControlProps, SelectProps } from '@mui/material'
+
+export interface SearchbarSelectCheckboxProps<T extends unknown> {
+  /**
+   * Default placeholder used by textfield inside autocomplete
+   */
+  placeholder?: string
+
+  /**
+   * array of data used to make search
+   */
+  searchData: T[] | undefined
+
+  /**
+   * Function used as map callback to iterate over *sarchData* to get value for group field
+   * @param value
+   */
+  groupBy: (value: T) => string
+
+  /**
+   * Function used to display custom data inside autocomplete
+   * @param value
+   */
+  toDisplay: (value: T) => any
+
+  /**
+   * Main div container props
+   */
+  divProps?: ComponentPropsWithoutRef<'div'>
+
+  /**
+   * Select (used as dropdown) props
+   */
+  selectProps?: SelectProps<string>
+
+  /**
+   * First form control, parent of dropdown props
+   */
+  firstFormControlProps?: FormControlProps
+
+  /**
+   * Second form control, parent of autocomplete props
+   */
+  secondFormControlProps?: FormControlProps
+
+  /**
+   * Checkbox used inside autocomplete props
+   */
+  searchCheckboxProps?: CheckboxProps
+
+  /**
+   * Autocomplete props
+   */
+  autoCompleteProps?: AutocompleteProps<T, true, false, false>
+}
+```
+
+Ce qu'il faut retenir ici, pour certains components utilisés j'ai créé une props qui contient tous les attributs
+possibles afin de rendre flexible la personalisation du component. (_Un futur article sera écrit sur comment
+je définis mes props pour faciliter les questions de personalisations quand plusieurs components_).
+
+## Conclusion
+
+Enfin, nous sommes à la fin. J'avoue qu'elle est un peu long cette partie 🤧. La documentation de MUI étant plutôt
+bien fournie, notre travail était juste d'écrire deux fonctions qui permettent de grouper et filtrer les données pour le
+dropdown et l'autocomplete.
+Cela soulève les problématiques suivantes qui seront abordées dans la `partie 2`:
+
+1. Avons nous réellement besoin deux `useMemo` pour avoir la liste des éléments pour le dropdown et l'autocomplete ?
+2. Comment extraite la logique du component pour qu'elle puise être réutilisée aussi bien avec MUI que d'autres
+   bibliothèques de UI comme Mantine ou Ant Design ?
+
+Le code complet (utilisable) est disponible ici
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
+et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectbox).
 
 ## So
 
