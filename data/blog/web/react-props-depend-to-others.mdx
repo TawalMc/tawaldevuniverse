@@ -7,7 +7,7 @@ summary: 'A tip to make some react props depend to others props.'
 images: []
 ---
 
-_(I'll avoid uncessary codes)_
+_(I'll avoid unnecessary codes)_
 
 Here I'll share a tip that I used recently (after some research 🤣) to make the existence of a (react) prop depend to the value
 of another in React with TypeScript.
@@ -17,11 +17,11 @@ of another in React with TypeScript.
 We have a `Menu` component which can have `MenuItem` or a custom react component as children.
 Let's say the signature of `MenuItem` is like this :
 
-```js
+```tsx
 // MenuItem.tsx
 export type MenuItemProps = {
-... // some props
-	label: string
+  // some props
+  label: string
 }
 
 export const MenuItem: React.FC<MenuItemProps> = ({ label }) => {
@@ -35,37 +35,36 @@ export const MenuItem: React.FC<MenuItemProps> = ({ label }) => {
 
 And the `Menu` component takes a list of `MenuItem` props and displays each `MenuItem` with its props:
 
-```js
+```tsx
 // Menu.tsx
 export type MenuProps = {
-	... // some props
-	menuItemList: MenuItemProps[]
+  // ... some props
+  menuItemList: MenuItemProps[]
 }
 
-export const Menu: React.FC<MenuProps> = ({menuItemList}) => {
-	return (
-		<div>
-			<h1>Menu</h1>
-				<div>
-					{
-						menuItemList.map((menuItem, index) => <MenuItem key={index} {...menuItem} />)
-					}
-				</div>
-		</div>
-	)
+export const Menu: React.FC<MenuProps> = ({ menuItemList }) => {
+  return (
+    <div>
+      <h1>Menu</h1>
+      <div>
+        {menuItemList.map((menuItem, index) => (
+          <MenuItem key={index} {...menuItem} />
+        ))}
+      </div>
+    </div>
+  )
 }
-
 ```
 
 ## The problem
 
 Now, I want that the user can display a custom component that he/she builds. Let's say a div with icon. We need `children` as props to `Menu` like this:
 
-```js
+```ts
 export type MenuProps = {
-	... // some props
-	menuItemList: MenuItemProps[]
-	children: React.ReactNode
+  // some props
+  menuItemList: MenuItemProps[]
+  children: React.ReactNode
 }
 ```
 
@@ -103,10 +102,10 @@ We make all of them optionals. As we want to bas our condition to the availabili
 
 #### 2nd step
 
-```js
+```ts
 export type MenusProps = {
-  children: React.ReactNode,
-  menuItemList?: never,
+  children: React.ReactNode
+  menuItemList?: never
 }
 ```
 
@@ -114,15 +113,15 @@ With this type, `MenuProps` can have `children` as prop but not `menuItemList`.
 
 #### 3rd step
 
-```js
+```ts
 export type MenusProps =
   | {
-      children?: null | undefined,
-      menuItemList?: MenuItemProps[],
+      children?: null | undefined
+      menuItemList?: MenuItemProps[]
     }
   | {
-      children: React.ReactNode,
-      menuItemList?: never,
+      children: React.ReactNode
+      menuItemList?: never
     }
 ```
 
@@ -134,22 +133,22 @@ prop and if he/she can pass nothing.
 
 The final type is
 
-```js
+```ts
 export type MenusProps =
   | {
-      children?: null | undefined,
-      menuItemList?: MenuItemProps[],
+      children?: null | undefined
+      menuItemList?: MenuItemProps[]
     }
   | {
-      children: Exclude<React.ReactNode, null | undefined>,
-      menuItemList?: never,
+      children: Exclude<React.ReactNode, null | undefined>
+      menuItemList?: never
     }
 ```
 
 A `React.ReactNode` can be `null | undefined` and so we have two optionals properties in the second union which is not the desired behavior. So we Exclude
 some values for children in this case and so we can write
 
-```js
+```tsx
 // Menu.tsx
 export type MenusProps =
   | {

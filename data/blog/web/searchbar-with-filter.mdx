@@ -10,7 +10,7 @@ images: []
 Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
 des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
 
-Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox)
+Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
 
 ## Le contexte
 
@@ -74,8 +74,7 @@ yarn add @mui/icons-material
 Ensuite un dossier `components/SearchbarWithSelectboxAndAutocompletionInMUI`
 et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
 
-- Pour les tests
-  Nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
+- Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
   Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
   **_data.json_** (stocké dans la constante `DummyData`) et **_index.ts_**.
 
@@ -85,12 +84,12 @@ et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
 2. `Sélectionner` certains utilisateurs
 
 Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react-autocomplete/)
-qui est un input qui permet la recherche dans une liste d'éléments qui peuvent être cochés.
+qui est un input permettant la recherche dans une liste d'éléments qui peuvent être cochés.
 Donc on aura (faîtes les imports nécessaires) :
 
 `SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
 
-```js
+```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
 const SearchbarSelectCheckbox = () => {
@@ -144,7 +143,291 @@ nous intéressent ici sont
 
 #### 3ᵉ étape : Le component de filtrage
 
-#### Bonus
+Ici c'est juste un select box à la MUI:
+
+```jsx
+<FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
+  <Select displayEmpty size="small" inputProps={{ 'aria-label': 'Without label' }}>
+    <MenuItem value="">Tout</MenuItem>
+    {['JSBenin', 'PythonBenin', 'RustBenin', 'PHPBenin'].map((entity) => (
+      <MenuItem key={entity} value={entity}>
+        {entity}
+      </MenuItem>
+    ))}
+  </Select>
+</FormControl>
+```
+
+Donc un select avec des menus items à l'intérieur lisant les différentes valeurs du select.
+
+<details >
+    <summary>Les deux codes ensemble ici</summary>
+
+`SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
+
+```jsx
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
+const checkedIcon = <CheckBoxIcon fontSize="small" />
+const SearchbarSelectCheckbox = () => {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', width: '500px' }}>
+      <FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
+        <Select displayEmpty size="small" inputProps={{ 'aria-label': 'Without label' }}>
+          <MenuItem value="">Tout</MenuItem>
+          {['JSBenin', 'PythonBenin', 'RustBenin', 'PHPBenin'].map((entity) => (
+            <MenuItem key={entity} value={entity}>
+              {entity}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
+      <FormControl fullWidth>
+        <Autocomplete
+          fullWidth
+          multiple
+          disableCloseOnSelect
+          limitTags={1}
+          sx={{
+            '& .MuiOutlinedInput-root': {
+              padding: 0,
+              height: 'auto',
+            },
+          }}
+          options={DummyData}
+          groupBy={(option: DummyDataType) => option.teams.title}
+          getOptionLabel={(option: DummyDataType) => `${option.firstName} ${option.lastName}`}
+          renderOption={(props, option, { selected }) => (
+            <li {...props}>
+              <Checkbox
+                icon={icon}
+                checkedIcon={checkedIcon}
+                style={{ marginRight: 8 }}
+                checked={selected}
+              />
+              {option.firstName} {option.lastName}
+            </li>
+          )}
+          renderInput={(params) => (
+            <TextField {...params} placeholder={'Populations'} sx={{ paddingY: 0 }} />
+          )}
+        />
+      </FormControl>
+    </div>
+  )
+}
+```
+
+</details>
+
+#### 4ᵉ étape : Le filtrage
+
+Nous allons nous baser sur l'image suivante:
+
+![Searchbar-with-filter-steps](/static/images/searchbarwithfilter.png)
+
+1. **Extraire le tableau pour le dropdown**
+
+L'utilsiateur fournit un tableau de données, on parcours celui-ci et nous récupérons les
+valeurs pour le dropdown en nous basant sur un callback que l'utilisateur renvoie.
+
+```jsx
+type SearchbarSelectCheckboxType<T extends unknown> = {
+    groupBy: (value: T) => string
+    data: T[] | undefined
+}
+
+const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
+   const {data, groupBy} = props;
+
+   let itemsGroup = useMemo(() => {
+   let itemsAsSet = new Set(data.map(groupBy));
+   let itemsAsList: string[] = [];
+
+    itemsAsSet.forEach((v) => {
+        if (v !== undefined && v !== null) itemsAsList.push(v);
+    });
+
+    return itemsAsList;
+
+   }, [data, groupBy]);
+
+    return (
+            {/** Le reste du code ici **/}
+    )
+}
+
+// example d'utilisation
+<SearchbarSelectCheckbox
+        data={DummyData}
+        groupBy={(value: DummyDataType) => value.teams.title}/>
+```
+
+En gros:
+
+- `Set` et `groupBy`: nous parcourons le tableau de données avec un `map`, et grâce au callback (`groupBy`)
+  passé en props, nous pouvons récupérer la liste (les valeurs) à fournir au dropdown. Nous le passons
+  à un `Set` pour supprimer les doublons.
+- `Array`: comme le dropdown reçoit un tableau d'options, nous convertissons le set en un tableau (javascript array) que
+  nous stockons dans _itemsGroup_.
+- `useMemo`: pour mémoriser cette liste (itemsGroup) et éviter de refaire ces opérations chaque fois qu'il y a un rendu du
+  component alors que la liste de
+  donnée n'a pas changé.
+
+2. **Grouper les données utilisées par le autocomplete**
+
+```js
+let optionForSearch = useMemo(() => {
+    let optionAsMap = new Map<string, T[]>();
+
+    optionAsMap.set(DEFAULT_SELECT_VALUE, data);
+    itemsGroup.forEach((value) => {
+        optionAsMap.set(
+            value,
+            data.filter((v) => groupBy(v) == value)
+        );
+    });
+
+    return optionAsMap;
+}, [itemsGroup]);
+```
+
+En gros:
+
+- `Map`: pour chaque élément du tableau précédent (**itemsGroup**), nous créons une clé-valeur où la clé
+  est l'élement provenant du tableau, et la valeur est la liste des données (provenant de **data**) filtrées
+  en se basant sur le callback `groupBy`.
+
+3. **Fournir les données au dropdown et à l'autocomplete**
+
+Nous avons déjà le tableau à passer au dropdown, les éléments regroupés qui seront fournis à l'autocomplete, donc
+dans cette étape, nous allons juste définir la liste à afficher en fonction de la catégorie.
+
+Je montre juste les parties du code concernées.
+
+```jsx
+
+{/*...some codes*/}
+
+const [selectedItem, setSelectedItem] = useState(DEFAULT_SELECT_VALUE);
+
+const handleSelectedItemChange = (event: SelectChangeEvent) => {
+      setSelectedItem(event.target.value);
+};
+
+<Select
+    {/*...*/}
+    value={selectedItem}
+    onChange={handleSelectedItemChange}
+  >
+    <MenuItem value={DEFAULT_SELECT_VALUE}>Tout</MenuItem>
+    {
+      itemsGroup.map(item => <MenuItem key={item} value={item}>{item}</MenuItem>)
+    }
+</Select>
+
+<Autocomplete
+    {/*...*/}
+    options={optionForSearch.get(selectedItem) ?? []}
+    groupBy={groupBy}
+/>
+
+{/*...some codes*/}
+```
+
+Ici rien de nouveau:
+
+- `useState`: on stocke dans un state local l'item choisi dans le dropdown et comme la liste des options
+  rendue par l'autocomplete est gardée dans un Map (avec comme clé les items du dropdown), nous pouvons alors
+  passer la liste d'options qu'il faut à l'autocomplete en nous basant sur la clé
+- `groupBy`: autocomplete de MUI utilise la même fonction groupBy (mais est ce que ça vaut la peine).
+- `DEFAULT_SELECT_VALUE`: est juste une valeur par défaut que vous donnez au dropdown
+
+4. **Et maintenant ?**
+
+Bref pas grande chose 🤣. Nous avons mis ensemble des components déjà créés par MUI et nous pouvons crier un peu
+partout que nous avons créé un custom component (très avancé): `Super!!!`. Avant de finir, abordons un dernier point:
+le typage de notre nouveau component.
+
+#### 5ᵉ étape : Le typage de la barre de recherche avec filtre
+
+Jetons un coup d'oeil à ce typage où j'intègre des commentaires:
+
+```ts
+import { AutocompleteProps, CheckboxProps, FormControlProps, SelectProps } from '@mui/material'
+
+export interface SearchbarSelectCheckboxProps<T extends unknown> {
+  /**
+   * Default placeholder used by textfield inside autocomplete
+   */
+  placeholder?: string
+
+  /**
+   * array of data used to make search
+   */
+  searchData: T[] | undefined
+
+  /**
+   * Function used as map callback to iterate over *sarchData* to get value for group field
+   * @param value
+   */
+  groupBy: (value: T) => string
+
+  /**
+   * Function used to display custom data inside autocomplete
+   * @param value
+   */
+  toDisplay: (value: T) => any
+
+  /**
+   * Main div container props
+   */
+  divProps?: ComponentPropsWithoutRef<'div'>
+
+  /**
+   * Select (used as dropdown) props
+   */
+  selectProps?: SelectProps<string>
+
+  /**
+   * First form control, parent of dropdown props
+   */
+  firstFormControlProps?: FormControlProps
+
+  /**
+   * Second form control, parent of autocomplete props
+   */
+  secondFormControlProps?: FormControlProps
+
+  /**
+   * Checkbox used inside autocomplete props
+   */
+  searchCheckboxProps?: CheckboxProps
+
+  /**
+   * Autocomplete props
+   */
+  autoCompleteProps?: AutocompleteProps<T, true, false, false>
+}
+```
+
+Ce qu'il faut retenir ici, pour certains components utilisés j'ai créé une props qui contient tous les attributs
+possibles afin de rendre flexible la personalisation du component. (_Un futur article sera écrit sur comment
+je définis mes props pour faciliter les questions de personalisations quand plusieurs components_).
+
+## Conclusion
+
+Enfin, nous sommes à la fin. J'avoue qu'elle est un peu long cette partie 🤧. La documentation de MUI étant plutôt
+bien fournie, notre travail était juste d'écrire deux fonctions qui permettent de grouper et filtrer les données pour le
+dropdown et l'autocomplete.
+Cela soulève les problématiques suivantes qui seront abordées dans la `partie 2`:
+
+1. Avons nous réellement besoin deux `useMemo` pour avoir la liste des éléments pour le dropdown et l'autocomplete ?
+2. Comment extraite la logique du component pour qu'elle puise être réutilisée aussi bien avec MUI que d'autres
+   bibliothèques de UI comme Mantine ou Ant Design ?
+
+Le code complet (utilisable) est disponible ici
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
+et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectbox).
 
 ## So
 

@@ -1,7 +1,7 @@
 ---
 title: '[Offside] - Steps to write code for embedded systems'
 date: '2021-07-26'
-tags: ['offside', 'iot', 'programming', 'cpp']
+tags: ['offside', 'iot', 'cpp']
 draft: false
 summary: "I'll present here how I manage myself to write code for embedded systems or during IoT projects."
 images:

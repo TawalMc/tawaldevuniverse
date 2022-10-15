@@ -24,8 +24,7 @@ export default function About() {
             </h3>
             <div className="text-gray-500 dark:text-gray-400">Power and Process Engineer.</div>
             <div className="text-gray-500 dark:text-gray-400">
-              Passionate about web dev, Game dev, computer programming and the world of software
-              dev.
+              Passionate about web dev, computer engineering and soccer.
             </div>
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} />
@@ -39,29 +38,21 @@ export default function About() {
           <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">
             <p>
               My name is Tawaliou ALAO and I am a young engineer in energy and process engineering
-              from Benin focused on web devlopment. I love computer programming and I explore the
-              world of software development to discover ... maybe aliens
+              from Benin. I love computer programming and I explore the world of software
+              engineering to discover ... maybe aliens. And
               <span role="img" aria-label="smile">
                 🤣
               </span>
               .
             </p>
             <p>
-              Writing code allows me to express myself, to think and to see, to realize what crosses
-              my mind. I can test my ideas, change my outlook. But above all, computer programming
-              for me is like an adventure to reach the pantheon of innovative developers, having
-              changed the course of history is a key objective ...{' '}
-              <span role="img" aria-label="look at">
-                🧐
-              </span>
-              . Using it in the field of energy or any other is just my vision.
+              Writing code allows me to express myself, to think and to see what crosses my mind. I
+              can test my ideas, change my outlook. Using it in the field of energy or any other
+              field is just my vision.
             </p>
             <p>
-              I am a fan of the C ++ language that I use in embedded systems (programming
-              microcontrollers, IoT, ...)and JavaScript because it allows me to be fullstack but
-              also to be independent and quickly realize my ideas for cross-platform web and mobile
-              applications through React.js/Next.js (my favorite JS framework), React Native and the
-              eternal NodeJS (it's so cool this runtime) that I use for setting up web server.
+              And here I talk about my discoveries in web development as well as in the embedded
+              world.
             </p>
           </div>
         </div>
