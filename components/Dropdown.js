@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-export default function Dropdown({ items, value, onChange }) {
+export default function Dropdown({ items, defaultValue, value, onChange }) {
   const [visibility, setVisibility] = useState(false)
 
   const handleItemChange = (item) => {
@@ -29,7 +29,7 @@ export default function Dropdown({ items, value, onChange }) {
           aria-haspopup="true"
           onClick={() => setVisibility((visibility) => !visibility)}
         >
-          {value}
+          {value ?? defaultValue}
         </button>
       </div>
 

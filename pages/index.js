@@ -2,7 +2,8 @@ import Link from '@/components/Link'
 import { PageSeo } from '@/components/SEO'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import { getAllFilesFrontMatter } from '@/lib/mdx'
+import { getAllFilesByLanguages, getAllFilesFrontMatter } from '@/lib/mdx'
+import { useRouter } from 'next/router'
 
 const MAX_DISPLAY = 5
 const postDateTemplate = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -10,10 +11,16 @@ const postDateTemplate = { year: 'numeric', month: 'long', day: 'numeric' }
 export async function getStaticProps() {
   const posts = await getAllFilesFrontMatter('blog')
 
-  return { props: { posts } }
+  const i18nPosts = await getAllFilesByLanguages()
+
+  return { props: { posts, i18nPosts } }
 }
 
-export default function Home({ posts }) {
+export default function Home({ i18nPosts }) {
+  const router = useRouter()
+  const { locale } = router
+  const posts = i18nPosts.find((post) => post.lang === locale)?.posts
+
   return (
     <>
       <PageSeo
@@ -33,7 +40,9 @@ export default function Home({ posts }) {
         <ul className="divide-y divide-gray-200 dark:divide-gray-700">
           {!posts.length && 'Auncun article trouvé.'}
           {posts.slice(0, MAX_DISPLAY).map((frontMatter) => {
-            const { slug, date, title, summary, tags } = frontMatter
+            let { slug, date, title, summary, tags } = frontMatter
+            slug = `${locale}/${slug}`
+            // console.log({slug})
             return (
               <li key={slug} className="py-12">
                 <article>
