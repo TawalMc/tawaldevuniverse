@@ -57,7 +57,7 @@ export default function PostPage({ posts, initialDisplayPosts, pagination }) {
         posts={posts}
         initialDisplayPosts={initialDisplayPosts}
         pagination={pagination}
-        title={langFile.listLayoutTitle}
+        title={'All articles'}
       />
     </>
   )

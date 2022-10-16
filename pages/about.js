@@ -9,8 +9,6 @@ export default function About() {
   const [langFile] = useAtom(langFileAtom)
   const about = langFile.about
 
-  console.log({ about })
-
   return (
     <>
       <PageSeo
