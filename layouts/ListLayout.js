@@ -3,10 +3,13 @@ import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { useState } from 'react'
 import Pagination from '@/components/Pagination'
+import { useAtom } from 'jotai'
+import { selectedLangAtom } from '@/lib/store'
 
 const postDateTemplate = { year: 'numeric', month: 'long', day: 'numeric' }
 
 export default function ListLayout({ posts, title, initialDisplayPosts = [], pagination }) {
+  const [selectedLang] = useAtom(selectedLangAtom)
   const [searchValue, setSearchValue] = useState('')
   const filteredBlogPosts = posts.filter((frontMatter) => {
     const searchContent = frontMatter.title + frontMatter.summary + frontMatter.tags.join(' ')
@@ -51,7 +54,8 @@ export default function ListLayout({ posts, title, initialDisplayPosts = [], pag
         <ul>
           {!filteredBlogPosts.length && 'No posts found.'}
           {displayPosts.map((frontMatter) => {
-            const { slug, date, title, summary, tags } = frontMatter
+            let { slug, date, title, summary, tags } = frontMatter
+            slug = `${selectedLang}/${slug}`
             return (
               <li key={slug} className="py-4">
                 <article className="space-y-2 xl:grid xl:grid-cols-4 xl:space-y-0 xl:items-baseline">

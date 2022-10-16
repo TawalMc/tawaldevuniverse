@@ -2,16 +2,22 @@ import Link from '@/components/Link'
 import { PageSeo } from '@/components/SEO'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
-import { getAllTags } from '@/lib/tags'
+import { getAllTags, getAllTagsByLanguages } from '@/lib/tags'
 import kebabCase from '@/lib/utils/kebabCase'
+import { useAtom } from 'jotai'
+import { selectedLangAtom } from '@/lib/store'
 
-export async function getStaticProps() {
+export async function getServerSideProps() {
   const tags = await getAllTags('blog')
 
-  return { props: { tags } }
+  const i18nTags = await getAllTagsByLanguages()
+
+  return { props: { tags, i18nTags } }
 }
 
-export default function Tags({ tags }) {
+export default function Tags({ i18nTags }) {
+  const [selectedLang] = useAtom(selectedLangAtom)
+  const tags = i18nTags.find((post) => post.lang === selectedLang)?.tags
   const sortedTags = Object.keys(tags).sort((a, b) => tags[b] - tags[a])
   return (
     <>

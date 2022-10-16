@@ -1,8 +1,16 @@
 import siteMetadata from '@/data/siteMetadata'
 import SocialIcon from '@/components/social-icons'
 import { PageSeo } from '@/components/SEO'
+import { useAtom } from 'jotai'
+import { langFileAtom, selectedLangAtom } from '@/lib/store'
 
 export default function About() {
+  const [selectedLang] = useAtom(selectedLangAtom)
+  const [langFile] = useAtom(langFileAtom)
+  const about = langFile.about
+
+  console.log({ about })
+
   return (
     <>
       <PageSeo
@@ -13,7 +21,7 @@ export default function About() {
       <div className="divide-y">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Who am I?
+            {about.sectionTitle}
           </h1>
         </div>
         <div className="items-start space-y-2 xl:grid xl:grid-cols-3 xl:gap-x-8 xl:space-y-0">
@@ -22,10 +30,8 @@ export default function About() {
             <h3 className="pt-4 pb-2 text-2xl font-bold leading-8 tracking-tight">
               {siteMetadata.author}
             </h3>
-            <div className="text-gray-500 dark:text-gray-400">Power and Process Engineer.</div>
-            <div className="text-gray-500 dark:text-gray-400">
-              Passionate about web dev, computer engineering and soccer.
-            </div>
+            <div className="text-gray-500 dark:text-gray-400">{about.job}</div>
+            <div className="text-gray-500 dark:text-gray-400">{about.hobbies}</div>
             <div className="flex pt-6 space-x-3">
               <SocialIcon kind="mail" href={`mailto:${siteMetadata.email}`} />
               <SocialIcon kind="github" href={siteMetadata.github} />
@@ -37,23 +43,14 @@ export default function About() {
           </div>
           <div className="pt-8 pb-8 prose dark:prose-dark max-w-none xl:col-span-2">
             <p>
-              My name is Tawaliou ALAO and I am a young engineer in energy and process engineering
-              from Benin. I love computer programming and I explore the world of software
-              engineering to discover ... maybe aliens. And
+              {about.shortDescription}
               <span role="img" aria-label="smile">
                 🤣
               </span>
               .
             </p>
-            <p>
-              Writing code allows me to express myself, to think and to see what crosses my mind. I
-              can test my ideas, change my outlook. Using it in the field of energy or any other
-              field is just my vision.
-            </p>
-            <p>
-              And here I talk about my discoveries in web development as well as in the embedded
-              world.
-            </p>
+            <p>{about.timeline}</p>
+            <p>{about.lastWords}</p>
           </div>
         </div>
       </div>

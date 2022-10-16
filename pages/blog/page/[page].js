@@ -3,6 +3,10 @@ import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesFrontMatter } from '@/lib/mdx'
 import ListLayout from '@/layouts/ListLayout'
 import { POSTS_PER_PAGE } from '../../blog'
+import { useEffect, useState } from 'react'
+import { useAtom } from 'jotai'
+import { langFileAtom, selectedLangAtom } from '@/lib/store'
+import { loadLangFile } from '@/lib/i18n'
 
 export async function getStaticPaths() {
   const totalPosts = await getAllFilesFrontMatter('blog')
@@ -53,7 +57,7 @@ export default function PostPage({ posts, initialDisplayPosts, pagination }) {
         posts={posts}
         initialDisplayPosts={initialDisplayPosts}
         pagination={pagination}
-        title="All articles"
+        title={langFile.listLayoutTitle}
       />
     </>
   )

@@ -4,6 +4,8 @@ import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import { getAllFilesByLanguages, getAllFilesFrontMatter } from '@/lib/mdx'
 import { useRouter } from 'next/router'
+import { useAtom } from 'jotai'
+import { langFileAtom, selectedLangAtom } from '@/lib/store'
 
 const MAX_DISPLAY = 5
 const postDateTemplate = { year: 'numeric', month: 'long', day: 'numeric' }
@@ -17,9 +19,9 @@ export async function getStaticProps() {
 }
 
 export default function Home({ i18nPosts }) {
-  const router = useRouter()
-  const { locale } = router
-  const posts = i18nPosts.find((post) => post.lang === locale)?.posts
+  const [selectedLang] = useAtom(selectedLangAtom)
+  const posts = i18nPosts.find((post) => post.lang === selectedLang)?.posts
+  const [langFile] = useAtom(langFileAtom)
 
   return (
     <>
@@ -31,7 +33,7 @@ export default function Home({ i18nPosts }) {
       <div className="divide-y divide-gray-200 dark:divide-gray-700">
         <div className="pt-6 pb-8 space-y-2 md:space-y-5">
           <h1 className="text-3xl font-extrabold leading-9 tracking-tight text-gray-900 dark:text-gray-100 sm:text-4xl sm:leading-10 md:text-6xl md:leading-14">
-            Recents
+            {langFile.latestArticles}
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
             {siteMetadata.description}
@@ -41,8 +43,7 @@ export default function Home({ i18nPosts }) {
           {!posts.length && 'Auncun article trouvé.'}
           {posts.slice(0, MAX_DISPLAY).map((frontMatter) => {
             let { slug, date, title, summary, tags } = frontMatter
-            slug = `${locale}/${slug}`
-            // console.log({slug})
+            slug = `${selectedLang}/${slug}`
             return (
               <li key={slug} className="py-12">
                 <article>

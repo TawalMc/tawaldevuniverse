@@ -7,19 +7,26 @@ import Footer from './Footer'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import Dropdown from '@/components/Dropdown'
-import { useEffect, useState } from 'react'
 import { languages } from '@/lib/constants'
+import { useAtom } from 'jotai'
+import { selectedLangAtom } from '@/lib/store'
 import { useRouter } from 'next/router'
+import { useEffect, useMemo, useState } from 'react'
 
 const LayoutWrapper = ({ children }) => {
   const router = useRouter()
-  const { locale } = router
+  const [selectedLang, setSelectedLang] = useAtom(selectedLangAtom)
+  const [displayLangSelection, setDisplayLangSelection] = useState(true)
 
   const handleLangChange = (lang) => {
-    const locale = lang
-    router.replace(router.pathname, router.asPath, { locale })
-    // router.push(router.pathname, router.asPath, { locale });
+    setSelectedLang(lang)
   }
+
+  useEffect(() => {
+    const listRoute = ['/', '/blog', '/tags', '/about']
+    if (listRoute.includes(router.asPath)) setDisplayLangSelection(true)
+    else setDisplayLangSelection(false)
+  }, [router])
 
   return (
     <SectionContainer>
@@ -53,7 +60,9 @@ const LayoutWrapper = ({ children }) => {
                 </Link>
               ))}
             </div>
-            <Dropdown items={languages} value={locale} onChange={handleLangChange} />
+            {displayLangSelection && (
+              <Dropdown items={languages} value={selectedLang} onChange={handleLangChange} />
+            )}
             <ThemeSwitch />
             <MobileNav />
           </div>
