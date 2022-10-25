@@ -10,7 +10,7 @@ images: []
 Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
 des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
 
-Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
+Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/index.tsx)
 
 ## Le contexte
 
@@ -71,10 +71,10 @@ yarn add @mui/material @emotion/react @emotion/styled
 yarn add @mui/icons-material
 ```
 
-Ensuite un dossier `components/SearchbarWithSelectboxAndAutocompletionInMUI`
+Ensuite un dossier `components/SearchbarWithSelectAndFilter`
 et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
 
-- Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectbox/tree/main/src/dummy).
+- Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/dummy).
   Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
   **_data.json_** (stocké dans la constante `DummyData`) et **_index.ts_**.
 
@@ -87,12 +87,12 @@ Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react
 qui est un input permettant la recherche dans une liste d'éléments qui peuvent être cochés.
 Donc on aura (faîtes les imports nécessaires) :
 
-`SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
+`component/SearchbarWithSelectAndFilter/index.tsx`
 
 ```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
-const SearchbarSelectCheckbox = () => {
+const SearchbarWithSelectAndFilter = () => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', width: '500px' }}>
       <FormControl fullWidth>
@@ -158,17 +158,17 @@ Ici c'est juste un select box à la MUI:
 </FormControl>
 ```
 
-Donc un select avec des menus items à l'intérieur lisant les différentes valeurs du select.
+Donc un select avec des menus items à l'intérieur listant les différentes valeurs du select.
 
 <details >
     <summary>Les deux codes ensemble ici</summary>
 
-`SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx`
+`SearchbarWithSelectAndFilter/index.tsx`
 
 ```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
-const SearchbarSelectCheckbox = () => {
+const SearchbarWithSelectAndFilter = () => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', width: '500px' }}>
       <FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
@@ -231,12 +231,12 @@ L'utilsiateur fournit un tableau de données, on parcours celui-ci et nous récu
 valeurs pour le dropdown en nous basant sur un callback que l'utilisateur renvoie.
 
 ```jsx
-type SearchbarSelectCheckboxType<T extends unknown> = {
+type SearchbarWithSelectAndFilterProps<T extends unknown> = {
     groupBy: (value: T) => string
     data: T[] | undefined
 }
 
-const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
+const SearchbarWithSelectAndFilter = (props: SearchbarWithSelectAndFilterProps) => {
    const {data, groupBy} = props;
 
    let itemsGroup = useMemo(() => {
@@ -257,7 +257,7 @@ const SearchbarSelectCheckbox = (props: SearchbarSelectCheckboxType) => {
 }
 
 // example d'utilisation
-<SearchbarSelectCheckbox
+<SearchbarWithSelectAndFilter
         data={DummyData}
         groupBy={(value: DummyDataType) => value.teams.title}/>
 ```
@@ -273,7 +273,7 @@ En gros:
   component alors que la liste de
   donnée n'a pas changé.
 
-2. **Grouper les données utilisées par le autocomplete**
+2. **Grouper les données utilisées par l'autocomplete**
 
 ```js
 let optionForSearch = useMemo(() => {
@@ -355,7 +355,7 @@ Jetons un coup d'oeil à ce typage où j'intègre des commentaires:
 ```ts
 import { AutocompleteProps, CheckboxProps, FormControlProps, SelectProps } from '@mui/material'
 
-export interface SearchbarSelectCheckboxProps<T extends unknown> {
+export interface SearchbarWithSelectAndFilterProps<T extends unknown> {
   /**
    * Default placeholder used by textfield inside autocomplete
    */
@@ -426,8 +426,8 @@ Cela soulève les problématiques suivantes qui seront abordées dans la `partie
    bibliothèques de UI comme Mantine ou Ant Design ?
 
 Le code complet (utilisable) est disponible ici
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/TawalMc/SearchbarWithSelectbox?file=src/component/SearchbarWithSelectboxAndAutocompletionInMUI/index.tsx)
-et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectbox).
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/index.tsx)
+et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectAndFilter).
 
 ## So
 
