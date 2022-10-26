@@ -13,32 +13,32 @@ _When I think about data type in my codes - TawalMc with [Excalidraw](https://ex
 
 # So we have int, long, char,... as words? no, as data types
 
-Okeuh. And after? Simple we use data types to declare our variables. Something like this:
+Okeuh. And after? Simple we use data types to declare our variables. Something like this (`c++`):
 
 ```c
 int position = 10;
 float average = 15.3;
 ```
 
-And each data type can hold (a maximum) `amount of data` (🤪). Each of them has a number of `bytes` that
-can be used to store them depending on the target architecture. And when we are in the embedded we must
-take care of them. We don't work on computer with GigaBytes as storage, and so the greater are our data
-the more bytes we consume and so more spaces. In addition, they are some side effects when we don't use right
-data types and one of them is: `data type overflow`.
+And each data type can hold a (a maximum) `amount of data` (🤪). Each of them has a number of `bytes` that can be used
+for storage depending on the target architecture. And when we are in embedded, we have to take care of it.
+We're not working on computers with GigaBytes as storage, so the bigger our data the more bytes we consume
+and therefore more space. Also, there are side effects when we don't use the right data types and one
+of them is `data type overflow`.
 
-## Overflow? Like a water over-flow a container
+## Overflow? Like a water overflowing from a container
 
 You know when water overflows a container, it simply `sinks`, but the container is just filled to it. No more.
-It's let's say the same thing which will happen if your data is bigger than your data types: it `cut-off`.
-So you try to store in `int` a value of `123456` on `Arduino`, not good.
+This is, let's say, the same thing that happens if your data is bigger than your data types: they get `cut-off`.
+So you are trying to store a value of `123456` in `int` on `Arduino`, not good.
 
 Recently I worked on project and faced this issue and only my computer knows how much time I take to figure it out.
 
 ## My Problem: store/get millis value
 
-You know with Arduino, `millis()` return the number of `milliseconds` since our `program is running`...
+You know that with Arduino, `millis()` return the number of `milliseconds` since the execution of our program...
 And the best type to store the `value returned` by `millis()` is `unsigned long`. Why?
-Because, `millis()` can return a value like `120'000` which equals to `2 (minutes)`. So imagine you try to store
+Because, `millis()` can return a value like `120'000` which is equal to `2 (minutes)`. So imagine you try to store
 this value in `unsigned int`... - _[☠️ Sacrilege - 💀 Offense]_
 
 Why again? Look at this [table that I get from sparkfun website.](https://learn.sparkfun.com/tutorials/data-types-in-arduino/defining-data-types)
@@ -93,24 +93,24 @@ void loop() {
 
 ### Guess what happens
 
-This piece of code execute correctly one time only. Why ? Simple:
+This piece of code executes correctly only once. Why does it do that ? Simple:
 
 1- After 02 minutes the expression `(millis() - duration_between_req >= MAX_TIME)` is true so
-my code execute first time the action and then put in `duration_between_req` the value returned by `millis()`
+my code first executes the action and then puts in `duration_between_req` the value returned by `millis()`
 let's say `121'000` so (2minutes+1seconde).
 
 2- But `unsigned int` cannot hold too much and it cut-off. Welcome to bug hunting!! So after just some seconds
 , the expression `(millis() - duration_between_req >= MAX_TIME)` is always true because `duration_between_req`
 don't hold all `value returned by millis` but just truncate it to be less than its maximal value `65'535`. And
-each second (less than 01 second) the program execute the if statement body...
+each second (less than 01 second) the program executes the if statement body...
 
-# Yes, it is so fun
+# Yes, it's so much fun
 
-I spent at least 30 minutes to understand my code (**my code hum, a code that I write myself**) and let's say, Arduino IDE don't help anymore...
+I spent at least 30 minutes to understand my code (**a code that I write myself**) and Arduino IDE doesn't help me either...
 
 And it is not the end, take care of `byte` yeah the word named `byte` because if by any kind of rain you
 store in Arduino `EEPROM` a data of type `int` and you try to retrieve it as a `long` and **vice versa**,
-**what will happen? What do you hope? What magic will occur? Ask your code...**
+**what will happen? What are you hoping for? What magic will happen? Ask your code...**
 
 I share some tips that I used in my daily tasks and I hope you've some others tips that you want to share with us.
 I'm open to advises, and my social accounts (below) are there for this purposes...
