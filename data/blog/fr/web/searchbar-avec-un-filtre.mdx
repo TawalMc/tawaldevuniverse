@@ -2,7 +2,7 @@
 title: '[web] - Une Barre de recherche avec un filtre en React - Partie 1: MUI'
 date: '2022-09-17'
 tags: ['web', 'typescript', 'react']
-draft: true
+draft: false
 summary: 'Nous allons créer en React une barre de recherche(avancée) avec filtre.'
 images: []
 ---
@@ -10,7 +10,7 @@ images: []
 Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
 des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
 
-Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/index.tsx)
+Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx)
 
 ## Le contexte
 
@@ -72,7 +72,7 @@ yarn add @mui/icons-material
 ```
 
 Ensuite un dossier `components/SearchbarWithSelectAndFilter`
-et à l'intérieur de ce dernier, un fichier `index.tsx` et `types.ts`.
+et à l'intérieur de ce dernier, un fichier `SearchbarWithSelectAndFilter.tsx` et `types.ts`.
 
 - Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/dummy).
   Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
@@ -87,7 +87,7 @@ Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react
 qui est un input permettant la recherche dans une liste d'éléments qui peuvent être cochés.
 Donc on aura (faîtes les imports nécessaires) :
 
-`component/SearchbarWithSelectAndFilter/index.tsx`
+`component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx`
 
 ```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
@@ -163,7 +163,7 @@ Donc un select avec des menus items à l'intérieur listant les différentes val
 <details >
     <summary>Les deux codes ensemble ici</summary>
 
-`SearchbarWithSelectAndFilter/index.tsx`
+`SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx`
 
 ```jsx
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
@@ -426,7 +426,7 @@ Cela soulève les problématiques suivantes qui seront abordées dans la `partie
    bibliothèques de UI comme Mantine ou Ant Design ?
 
 Le code complet (utilisable) est disponible ici
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/index.tsx)
+[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx)
 et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectAndFilter).
 
 ## So
