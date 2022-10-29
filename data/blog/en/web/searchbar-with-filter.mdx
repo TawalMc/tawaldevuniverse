@@ -1,34 +1,33 @@
 ---
-title: '[web] - Une Barre de recherche avec un filtre en React - Partie 1'
+title: '[web] - Build a search bar with filter in React - Part 1'
 date: '2022-09-17'
 tags: ['web', 'typescript', 'react']
 draft: true
-summary: 'Nous allons créer en React une barre de recherche(avancée) avec filtre.'
+summary: 'We will create in React a search bar (advanced) with filter.'
 images: []
 ---
 
-Nous allons créer en React une barre de recherche avec des checkbox pour sélectionner
-des éléments le tout accompagné d'un filtre _(intéressant n'est-ce pas ? Je sais)_.
+We are going to create in React a search bar with checkboxes to select
+elements with a filter _(interesting isn't it ? I know)_.
 
-Le rendu final peut être testé sur StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx)
+The final rendering can be tested on StackBlitz. [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx)
 
-## Le contexte
+## The context
 
-Dans une de mes tâches dans la boîte où je travaille, il y a un formulaire dans lequel
-un administrateur devrait attribuer des fonctionnalités à des utilisateurs. Donc il peut
-sélectionner des utilisateurs, soit taper le nom et sélectionner certains ou juste grouper
-les utilisateurs par leur rôle. Donc en gros une barre de recherche avec un filtre et quelques
-autres fonctionnalités. Donc j'ai fait une première implémentation en utilisant Material UI
-que je vais décrire ici.
+In one of my tasks in the company where I work, there is a form in which
+an administrator should assign features to users. So he can
+select users, either type the name and select some or just group the users by the users by their role. So basically a search bar with a filter and some
+other features. So I made a first implementation using Material UI
+which I will describe here.
 
-## Le problème
+## The issue
 
-1. `Grouper` les utilisateurs sur la base d'une `caractéristique quelconque`
-2. `Sélectionner` certains utilisateurs
-3. `Filtrer` la liste d'utilisateurs en se basant sur les différents groupes
-4. `Exposer` la liste d'utilisateurs choisis
+1. `Group` users based on any `characteristic`
+2. `Select` some users
+3. `Filter` the list of users based on different groups
+4. `Expose` the list of selected users
 
-Un peu comme sur la vidéo suivante
+Just like the following video
 
 <div
   style={{
@@ -40,28 +39,28 @@ Un peu comme sur la vidéo suivante
 >
   <video width="500" height="340" loop controls autoPlay muted>
     <source
-      aria-label={'Barre de recherche avec filtre'}
+      aria-label={'Search bar with filter'}
       about={''}
       src={'/static/images/barre_de_recherche_avec_filtre.mp4'}
       type="video/mp4"
     />
-    Votre navigateur ne prend pas en charge audio ou video.
+    Your browser doesn't support audio or video.
   </video>
 </div>
 
-## La solution
+## The solution
 
-#### 1ère étape : configuration du projet
+#### Step 1: Project configuration
 
-En supposant que node est installé sur votre machine, nous allons :
+Assuming you have node installed on your machine, we will :
 
-- configurer un petit projet react + typescript en utilisant vite
+- set up a small react + typescript project using vite
 
 ```shell
 yarn create vite
 ```
 
-- installer les dépendances de MUI
+- install MUI's dependencies
 
 ```shell
 yarn add @mui/material @emotion/react @emotion/styled
@@ -71,21 +70,21 @@ yarn add @mui/material @emotion/react @emotion/styled
 yarn add @mui/icons-material
 ```
 
-Ensuite nous créons un dossier `components/SearchbarWithSelectAndFilter`
-et à l'intérieur de ce dernier, un fichier `SearchbarWithSelectAndFilter.tsx` et `types.ts`.
+Then we create a `components/SearchbarWithSelectAndFilter` folder
+and inside the latter, a `SearchbarWithSelectAndFilter.tsx` and `types.ts` file.
 
-- Pour les tests nous utiliserons un json déjà disponible sur mon [github](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/dummy).
-  Donc vous pouvez récupérer le dossier **_dummy_** contenant le fichier
-  **_data.json_** (stocké dans la constante `DummyData`) et **_index.ts_**.
+- For testing we will use a json already available [here](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/dummy).
+  So you can get the **_dummy_** folder containing the file
+  **_data.json_** (stored in the constant `DummyData`) and **_index.ts_**.
 
-#### 2ᵉ étape : Les deux premiers points
+#### Step 2: The first two points
 
-1. `Grouper` les utilisateurs sur la base d'une `caractéristique quelconque`
-2. `Sélectionner` certains utilisateurs
+1. `Group` users based on any `characteristic`.
+2. `Select` certain users
 
-Material UI fourni le component [Autocomplete](https://mui.com/material-ui/react-autocomplete/)
-qui est un input permettant la recherche dans une liste d'éléments qui peuvent être cochés.
-Donc on aura (faîtes les imports nécessaires) :
+Material UI provides the component [Autocomplete](https://mui.com/material-ui/react-autocomplete/)
+which is an input allowing the search in a list of elements that can be checked.
+So we have (make the necessary imports) :
 
 `component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx`
 
@@ -131,19 +130,18 @@ const SearchbarWithSelectAndFilter = () => {
 }
 ```
 
-Vous l'aurez remarqué, il y a le checkbox qui est rendu par le component et les deux props qui
-nous intéressent ici sont
+You will have noticed that the checkbox is rendered by the component and the two props we are interested in here are
 
-- `options` qui prend le tableau de données
+- `options` which takes the array of data
 
-- `groupBy` qui prend une fonction (callback) qu'elle applique à chaque élément de la liste pour
-  gérer le groupage
+- `groupBy` which takes a function (callback) that it applies to each element of the list to
+  manage the grouping
 
-**Bon disons la vérité, jusque-là on a fait que copier la doc de MUI, merci à eux.**
+**Let's tell the truth, so far we just copied the MUI doc, thanks to them.**
 
-#### 3ᵉ étape : Le component de filtrage
+#### Step 3: The filter component
 
-Ici c'est juste un select box à la MUI:
+Here it is just a MUI select box:
 
 ```jsx
 <FormControl sx={{ minWidth: '150px', marginRight: 1 }}>
@@ -158,10 +156,10 @@ Ici c'est juste un select box à la MUI:
 </FormControl>
 ```
 
-Donc un select avec des menus items à l'intérieur listant les différentes valeurs du select.
+So a select with menu items inside listing the different values of the select.
 
 <details >
-    <summary>Les deux codes ensemble ici</summary>
+    <summary>Both codes together here</summary>
 
 `SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx`
 
@@ -219,16 +217,16 @@ const SearchbarWithSelectAndFilter = () => {
 
 </details>
 
-#### 4ᵉ étape : Le filtrage
+#### Step 4: Filtering
 
-Nous allons nous baser sur l'image suivante:
+We are going to use the following image as a basis:
 
 ![Searchbar-with-filter-steps](/static/images/searchbarwithfilter.png)
 
-1. **Extraire le tableau pour le dropdown**
+1. **Extract the array for the dropdown**
 
-L'utilsiateur fournit un tableau de données, on parcours celui-ci et nous récupérons les
-valeurs pour le dropdown en nous basant sur un callback que l'utilisateur renvoie.
+The user provides an array of data, we traverse it and we recover the values for the dropdown
+based on a callback that the user returns.
 
 ```jsx
 type SearchbarWithSelectAndFilterProps<T extends unknown> = {
@@ -252,28 +250,26 @@ const SearchbarWithSelectAndFilter = (props: SearchbarWithSelectAndFilterProps) 
    }, [data, groupBy]);
 
     return (
-            {/** Le reste du code ici **/}
+  {/** Rest of code here **/}
     )
 }
 
-// example d'utilisation
+{/* A use case */}
 <SearchbarWithSelectAndFilter
         data={DummyData}
         groupBy={(value: DummyDataType) => value.teams.title}/>
 ```
 
-En gros:
+Bottom line:
 
-- `Set` et `groupBy`: nous parcourons le tableau de données avec un `map`, et grâce au callback (`groupBy`)
-  passé en props, nous pouvons récupérer la liste (les valeurs) à fournir au dropdown. Nous le passons
-  à un `Set` pour supprimer les doublons.
-- `Array`: comme le dropdown reçoit un tableau d'options, nous convertissons le set en un tableau (javascript array) que
-  nous stockons dans _itemsGroup_.
-- `useMemo`: pour mémoriser cette liste (itemsGroup) et éviter de refaire ces opérations chaque fois qu'il y a un rendu du
-  component alors que la liste de
-  donnée n'a pas changé.
+- `Set` and `groupBy`: we traverse the data array with a `map`, and with the callback (`groupBy`)
+  passed in props, we can retrieve the list (values) to be provided to the dropdown. We pass it
+  to a `Set` to remove duplicates.
+- `Array`: as the dropdown receives an array of options, we convert the set to an array (javascript array) which we store in _itemsGroup_.
+- `useMemo`: to memorize this list (itemsGroup) and avoid doing this every time the
+  component while the has not changed.
 
-2. **Grouper les données utilisées par l'autocomplete**
+2. 2. **Group the data used by the autocomplete**.
 
 ```js
 let optionForSearch = useMemo(() => {
@@ -291,18 +287,16 @@ let optionForSearch = useMemo(() => {
 }, [itemsGroup]);
 ```
 
-En gros:
+Basically:
 
-- `Map`: pour chaque élément du tableau précédent (**itemsGroup**), nous créons une clé-valeur où la clé
-  est l'élement provenant du tableau, et la valeur est la liste des données (provenant de **data**) filtrées
-  en se basant sur le callback `groupBy`.
+- `Map`: for each element in the previous array (**itemsGroup**), we create a key-value where the key is the element from the array, and the value is the list of data (from **data**) filtered based on the `groupBy` callback.
 
-3. **Fournir les données au dropdown et à l'autocomplete**
+3. **Provide data to dropdown and autocomplete**
 
-Nous avons déjà le tableau à passer au dropdown, les éléments regroupés qui seront fournis à l'autocomplete, donc
-dans cette étape, nous allons juste définir la liste à afficher en fonction de la catégorie.
+We already have the array to pass to the dropdown as well as the grouped elements that will be provided to the autocomplete, so
+in this step, we're just going to define the list to display based on the category.
 
-Je montre juste les parties du code concernées.
+I'm just showing the parts of the code involved.
 
 ```jsx
 
@@ -334,23 +328,21 @@ const handleSelectedItemChange = (event: SelectChangeEvent) => {
 {/*...some codes*/}
 ```
 
-Ici rien de nouveau:
+Nothing new here:
 
-- `useState`: on stocke dans un state local l'item choisi dans le dropdown et comme la liste des options
-  rendue par l'autocomplete est gardée dans un Map (avec comme clé les items du dropdown), nous pouvons alors
-  passer la liste d'options qu'il faut à l'autocomplete en nous basant sur la clé
-- `groupBy`: autocomplete de MUI utilise la même fonction groupBy (mais est ce que ça vaut la peine).
-- `DEFAULT_SELECT_VALUE`: est juste une valeur par défaut que vous donnez au dropdown
+- `useState`: we store in a local state the item chosen in the dropdown and as the list of options
+  rendered by the autocomplete is kept in a Map (with the dropdown items as key), we can then pass the list of options we need to the autocomplete based on the key
+- `groupBy`: autocomplete from MUI uses the same groupBy function.
+- DEFAULT_SELECT_VALUE`: is just a default value you give to the dropdown
 
-4. **Et maintenant ?**
+4. \*\*And now?
 
-Bref pas grande chose 🤣. Nous avons mis ensemble des components déjà créés par MUI et nous pouvons crier un peu
-partout que nous avons créé un custom component (très avancé): `Super!!!`. Avant de finir, abordons un dernier point:
-le typage de notre nouveau component.
+So not much to go on 🤣. We put together components already created by MUI and we can shout everywhere that we have created a (very advanced) custom component: `Super!!!`. Before we finish, let's address two other points:
+The props types of our new component and how to use it.
 
-#### 5ᵉ étape : Le typage de la barre de recherche avec filtre
+#### Step 5: The props types of the search bar with filter
 
-Jetons un coup d'oeil à ce typage où j'intègre des commentaires:
+Let's take a look at this typing where I embed comments:
 
 ```ts
 import { AutocompleteProps, CheckboxProps, FormControlProps, SelectProps } from '@mui/material'
@@ -410,12 +402,13 @@ export interface SearchbarWithSelectAndFilterProps<T extends unknown> {
 }
 ```
 
-Ce qu'il faut retenir ici, pour certains components utilisés j'ai créé une props qui contient tous les attributs
-possibles afin de rendre flexible la personalisation du component. (_Un futur article sera écrit sur comment
-je définis mes props pour faciliter les questions de personalisations quand plusieurs components_).
+The important thing to remember here is that for some of the components used I have created a props that contains
+all the possible attributes in order to make the customization of the component flexible.
+(_A future article will be written about how I define my props to facilitate customization issues when several components are used_).
 
-** A quoi ressemble le component ?**
-Simple, nous créons un fichier MUI qui va appeler le nouveau composant créé comme suit:
+** What does the component look like?**
+
+Simple, we create a MUI file that will call the newly created component as follows:
 
 src/views/MUI.tsx
 
@@ -442,13 +435,13 @@ const MUI = () => {
 export default MUI
 ```
 
-#### 6ᵉ étape : Récupérer les éléments sélectionnés
+#### Step 6: Retrieve the selected elements
 
-Après la création du component, nous allons pouvoir récupérer la liste des éléments (options) sélectionnés. Nous allons
-afficher le nom et le rôle de ceux qui ont été sélectionnés, et pour cela, utiliserons deux nouveaux components,
-Card et Cards que vous pouvez récupérer sur le dépot ici: [Card](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/component/Card)
+After the component is created, we will be able to retrieve the list of selected elements (options). We will
+display the name and role of those that have been selected, and for this, we will use two new components,
+Card and Cards that you can get from the repository here: [Card](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/component/Card)
 
-En gros dans le fichier `src/component/Card/Card.tsx`
+Basically in the file `src/component/Card/Card.tsx` we have
 
 ```tsx
 import { DummyDataType } from '../../dummy'
@@ -474,7 +467,7 @@ const Card = (props: CardProps) => {
 export default Card
 ```
 
-puis son css `src/component/Card/Card.module.css`
+then its css `src/component/Card/Card.module.css`
 
 ```css
 .card {
@@ -498,7 +491,7 @@ img {
 }
 ```
 
-et dans celui de src/component/Card/Cards.tsx
+and in src/component/Card/Cards.tsx
 
 ```tsx
 import style from './Cards.module.css'
@@ -522,7 +515,7 @@ const Cards = ({ items }: CardsProps) => {
 export default Cards
 ```
 
-ainsi que son css `src/component/Card/Cards.module.css`
+and that its css `src/component/Card/Cards.module.css`
 
 ```css
 .gridContainer {
@@ -534,12 +527,12 @@ ainsi que son css `src/component/Card/Cards.module.css`
 }
 ```
 
-Dans Card, nous affichons les informations de chaque élément sélectionné et avec Cards nous affichons une liste de Card
+In Card, we display the information of each selected element and with Cards we display a list of Card
 
-Pour récupérer la liste d'élément sélectionné, nous utiliserons un state qui sera passé à l'autocomplète de MUI.
-Et si vous aviez fait la remarque dans le typage `SearchbarWithSelectAndFilter` présenté un peu plus haut,
-il a une props `autoCompleteProps` qui hérite de toutes les props de Autocomplete de MUI. En effet, cette props
-est passée sous forme destructurée au composant Autocomplete utilisé comme suit
+To retrieve the list of selected items, we will use a state that will be passed to the MUI autocomplete.
+And if you had made the remark in the list of `SearchbarWithSelectAndFilter` props presented a little above,
+it has an `autoCompleteProps` which inherits all the props of Autocomplete of MUI. Indeed, this props
+is passed in destructured form to the Autocomplete component used as follows
 
 ```jsx
 <Autocomplete
@@ -554,9 +547,8 @@ est passée sous forme destructurée au composant Autocomplete utilisé comme su
 </Autocomplete>
 ```
 
-Et dans les props de Autocomplete, il y a `value` et `onChange` que nous utiliserons.
-Nous allons pour celà, le composant MUI créé plus haut qui va utiliser le composant SearchbarWithSelectAndFilter
-et affichera la liste sélectionnée.
+In the Autocomplete props, there are `value` and `onChange` that we will use.
+We will use the MUI component created above.
 
 src/views/MUI.tsx
 
@@ -594,31 +586,33 @@ const MUI = () => {
 export default MUI
 ```
 
-1. Nous créons un state `[selectedOptions, setSelectedOptions]` qui garde laliste sélectionée
-2. Nous passons aux props **value** et **onChange** de Autocomplete respectivement selectedOptions et une function
-   qui met à jour setSelectedOptions. Ceci se fait grâce à la prop `autocompleteProps` de notre `SearchbarWithSelectAndFilter`
-3. Nous passons ensuite à `Cards` cette liste (selectedOptions).
+1. We create a state `[selectedOptions, setSelectedOptions]` that keeps the selected list
+2. We pass to the **value** and **onChange** props of Autocomplete respectively selectedOptions and a function
+   that updates setSelectedOptions. This is done using the `autocompleteProps` prop of our `SearchbarWithSelectAndFilter`.
+3. We then pass this list (selectedOptions) to `Cards`.
 
-Le résultat est à peu près ceci:
+The result is something like this:
 
-![Liste des options sélectionnées](/static/images/searchbarwithfilter_selected_options.png)
+![List of selected options](/static/images/searchbarwithfilter_selected_options.png)
 
-Super.
+Great.
 
 ## Conclusion
 
-Enfin, nous sommes à la fin. J'avoue qu'elle est un peu long cette partie 🤧. La documentation de MUI étant plutôt
-bien fournie, notre travail était juste d'écrire deux fonctions qui permettent de grouper et filtrer les données pour le
-dropdown et l'autocomplete.
-Cela soulève les problématiques suivantes qui seront abordées dans la `partie 2`:
+Finally, we are at the end. I admit that it is a little long this part 🤧. The documentation of MUI being rather
+well provided, our job was to write functions that allow to group and filter the data for the
+dropdown and autocomplete.
+This raises the following issues which will be discussed in `part 2`:
 
-1. Avons nous réellement besoin deux `useMemo` pour avoir la liste des éléments pour le dropdown et l'autocomplete ?
-2. Comment extraire la logique du component pour qu'elle puise être réutilisée aussi bien avec MUI que d'autres
-   bibliothèques de UI comme Mantine ou Ant Design ?
+1. Do we really need two `useMemo` to get the list of elements for dropdown and autocomplete?
+2. How to extract the logic from the component so that it can be reused with MUI as well as other
+   UI libraries like Mantine or Ant Design?
+3. How to configure the component so that it accepts a reference and can be used by libraries like
+   react-hook-form in a form?
 
-Le code complet (utilisable) est disponible ici
+The complete code is available here
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/edit/searchbarwithselectandfilter?file=src/component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter.tsx)
-et sur mon [Github](https://github.com/TawalMc/SearchbarWithSelectAndFilter).
+and on my [Github](https://github.com/TawalMc/SearchbarWithSelectAndFilter).
 
 ## So
 
