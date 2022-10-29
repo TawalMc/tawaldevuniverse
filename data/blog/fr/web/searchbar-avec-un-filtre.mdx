@@ -1,5 +1,5 @@
 ---
-title: '[web] - Une Barre de recherche avec un filtre en React'
+title: '[web] - Une Barre de recherche avec un filtre en React - Partie 1'
 date: '2022-09-17'
 tags: ['web', 'typescript', 'react']
 draft: true
@@ -348,8 +348,6 @@ Bref pas grande chose 🤣. Nous avons mis ensemble des components déjà créé
 partout que nous avons créé un custom component (très avancé): `Super!!!`. Avant de finir, abordons un dernier point:
 le typage de notre nouveau component.
 
-#### 6ᵉ étape :
-
 #### 6ᵉ étape : Le typage de la barre de recherche avec filtre
 
 Jetons un coup d'oeil à ce typage où j'intègre des commentaires:
@@ -416,6 +414,197 @@ Ce qu'il faut retenir ici, pour certains components utilisés j'ai créé une pr
 possibles afin de rendre flexible la personalisation du component. (_Un futur article sera écrit sur comment
 je définis mes props pour faciliter les questions de personalisations quand plusieurs components_).
 
+** A quoi ressemble le component ?**
+Simple, nous créons un fichier MUI qui va appeler le nouveau composant créé comme suit:
+
+src/views/MUI.tsx
+
+```tsx
+import { DummyData, DummyDataType } from '../dummy'
+import SearchbarWithSelectAndFilter from '../component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter'
+
+const MUI = () => {
+  return (
+    <div>
+      <SearchbarWithSelectAndFilter
+        searchData={DummyData}
+        groupBy={(value: DummyDataType) => value.teams.title}
+        toDisplay={(value) => `${value.firstName} ${value.lastName}`}
+        autoCompleteProps={{
+          options: DummyData,
+          renderInput: () => <></>,
+        }}
+      />
+    </div>
+  )
+}
+
+export default MUI
+```
+
+#### 7ᵉ étape : Récupérer les éléments sélectionnés
+
+Après la création du component, nous allons pouvoir récupérer la liste des éléments (options) sélectionnés. Nous allons
+afficher le nom et le rôle de ceux qui ont été sélectionnés, et pour cela, utiliserons deux nouveaux components,
+Card et Cards que vous pouvez récupérer sur le dépot ici: [Card](https://github.com/TawalMc/SearchbarWithSelectAndFilter/tree/main/src/component/Card)
+
+En gros dans le fichier `src/component/Card/Card.tsx`
+
+```tsx
+import { DummyDataType } from '../../dummy'
+import style from './Card.module.css'
+
+export type CardProps = DummyDataType
+
+const Card = (props: CardProps) => {
+  return (
+    <div className={style.card}>
+      <div className={style.container}>
+        <h4>
+          <b>
+            {props.firstName} {props?.lastName}
+          </b>
+        </h4>
+        <p>{props.teams.title}</p>
+      </div>
+    </div>
+  )
+}
+
+export default Card
+```
+
+puis son css `src/component/Card/Card.module.css`
+
+```css
+.card {
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  width: 150px;
+  height: 150px;
+  border-radius: 5px;
+}
+
+.card:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+img {
+  border-radius: 5px 5px 0 0;
+}
+
+.container {
+  padding: 2px 16px;
+}
+```
+
+et dans celui de src/component/Card/Cards.tsx
+
+```tsx
+import style from './Cards.module.css'
+import { CardProps } from './Card/Card'
+import Card from './Card'
+
+export type CardsProps = {
+  items: CardProps[]
+}
+
+const Cards = ({ items }: CardsProps) => {
+  return (
+    <div className={style.gridContainer}>
+      {items.map((item, index) => (
+        <Card key={index} {...item} />
+      ))}
+    </div>
+  )
+}
+
+export default Cards
+```
+
+ainsi que son css `src/component/Card/Cards.module.css`
+
+```css
+.gridContainer {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-template-rows: 80px auto 80px;
+  column-gap: 20px;
+  row-gap: 90px;
+}
+```
+
+Dans Card, nous affichons les informations de chaque élément sélectionné et avec Cards nous affichons une liste de Card
+
+Pour récupérer la liste d'élément sélectionné, nous utiliserons un state qui sera passé à l'autocomplète de MUI.
+Et si vous aviez fait la remarque dans le typage `SearchbarWithSelectAndFilter` présenté un peu plus haut,
+il a une props `autoCompleteProps` qui hérite de toutes les props de Autocomplete de MUI. En effet, cette props
+est passée sous forme destructurée au composant Autocomplete utilisé comme suit
+
+```jsx
+<Autocomplete
+  fullWidth
+  multiple
+  disableCloseOnSelect
+  limitTags={1}
+  {...autoCompleteProps}
+  /// d'autres props
+>
+  {/* d'autres contenus */}
+</Autocomplete>
+```
+
+Et dans les props de Autocomplete, il y a `value` et `onChange` que nous utiliserons.
+Nous allons pour celà, le composant MUI créé plus haut qui va utiliser le composant SearchbarWithSelectAndFilter
+et affichera la liste sélectionnée.
+
+src/views/MUI.tsx
+
+```tsx
+import { DummyData, DummyDataType } from '../dummy'
+import SearchbarWithSelectAndFilter from '../component/SearchbarWithSelectAndFilter/SearchbarWithSelectAndFilter'
+import Cards from '../component/Card/Cards'
+import { useState } from 'react'
+
+const MUI = () => {
+  const [selectedOptions, setSelectedOptions] = useState<DummyDataType[]>([])
+
+  // console.log(selectedOptions)
+
+  return (
+    <div>
+      <SearchbarWithSelectAndFilter
+        searchData={DummyData}
+        groupBy={(value: DummyDataType) => value.teams.title}
+        toDisplay={(value) => `${value.firstName} ${value.lastName}`}
+        autoCompleteProps={{
+          options: DummyData,
+          renderInput: () => <></>,
+          value: selectedOptions,
+          onChange: (_event, value) => setSelectedOptions(value),
+        }}
+      />
+      <br />
+
+      <Cards items={selectedOptions} />
+    </div>
+  )
+}
+
+export default MUI
+```
+
+1. Nous créons un state `[selectedOptions, setSelectedOptions]` qui garde laliste sélectionée
+2. Nous passons aux props **value** et **onChange** de Autocomplete respectivement selectedOptions et une function
+   qui met à jour setSelectedOptions. Ceci se fait grâce à la prop `autocompleteProps` de notre `SearchbarWithSelectAndFilter`
+3. Nous passons ensuite à `Cards` cette liste (selectedOptions).
+
+Le résultat est à peu près ceci:
+
+![Liste des options sélectionnées](/static/images/searchbarwithfilter_selected_options.png)
+
+Super.
+
 ## Conclusion
 
 Enfin, nous sommes à la fin. J'avoue qu'elle est un peu long cette partie 🤧. La documentation de MUI étant plutôt
@@ -424,7 +613,7 @@ dropdown et l'autocomplete.
 Cela soulève les problématiques suivantes qui seront abordées dans la `partie 2`:
 
 1. Avons nous réellement besoin deux `useMemo` pour avoir la liste des éléments pour le dropdown et l'autocomplete ?
-2. Comment extraite la logique du component pour qu'elle puise être réutilisée aussi bien avec MUI que d'autres
+2. Comment extraire la logique du component pour qu'elle puise être réutilisée aussi bien avec MUI que d'autres
    bibliothèques de UI comme Mantine ou Ant Design ?
 
 Le code complet (utilisable) est disponible ici
