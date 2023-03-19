@@ -127,51 +127,6 @@ Et ils sont allés loin (franchement ils ne dorment pas) en mettant à dispositi
 vous voulez mettre à disposition des données/API à des devs ou à d'autres équipes. Donc plus besoin d'aller
 créer un autre projet en Node.js et créer une API à part entière.
 
-### Import global dans le projet
-
-Alors là sérieusement, j'ai apprécié. Vous vous rappelez quand on crée des fichiers (components) dans des sous-dossiers
-et que lors des imports nous faisons face à des chemins très longs de laideur et d'erreurs:
-
-```jsx
-import NavBar from '../../components/somewhere'
-```
-
-Bah dites vous que Next.js corrige ça avec les imports globaux.
-Donc vous pouvez depuis n'importe quel fichier (quelque soit l'endroit/dossier) avoir ceci finalement :
-
-```jsx
-import NavBar from '@/components/somewhere'
-```
-
-Super chic, élégant et méritant l'oscar de la `solution intuitive`. Et pour y arriver rien de plus simple:
-
-- Vous créez un fichier soit jsconfig.json soir tsconfig.json (en fonction de votre projet)
-- Vous indiquez les chemins/dossiers qui seront pris en compte comme import global (exemple suivant)
-
-```jsx
-// jsconfig.json or tsconfig.json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/components/*": ["components/*"],
-      "@/data/*": ["data/*"],
-      "@/layouts/*": ["layouts/*"],
-      "@/lib/*": ["lib/*"],
-      "@/css/*": ["css/*"]
-    }
-  }
-}
-```
-
-Et le tour est joué!
-
-Alors je m'en arrête là. Oui parceque en termes d'innovations, Next.js vient avec un lot de
-features. Je n'ai pas abordé l'optimisation des images, de SWC (Speed Web Compiler) qui est 20 fois
-plus rapide que Babel dans la compilation des fichiers JS/TS, les questions de rendu (SSG, SSR, ISR),
-l'utilisation de Next.js avec Capacitor pour les applications hybrides, etc. Vous pouvez vos rendre sur
-le [site de Next.js](https://nextjs.org/) pour avoir plus d'informations.
-
 ## Enfin ?
 
 Ce n'est pas pour balayé du revers de la main create-react-app qui reste super comme outils mais si vous
